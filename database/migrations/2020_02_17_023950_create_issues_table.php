@@ -15,7 +15,9 @@ class CreateIssuesTable extends Migration
     {
         Schema::create('issues', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('project_id');
+            $table->unsignedBigInteger('project_id');
+            $table->unsignedBigInteger('post_user_id');
+            $table->unsignedBigInteger('assigned_user_id');
             $table->string('type');
             $table->string('subject');
             $table->text('description');

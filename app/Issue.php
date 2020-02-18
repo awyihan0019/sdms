@@ -7,15 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 class Issue extends Model
 {
     //
-    protected $fillable = ['type', 'subject', 'description', 'priority', 'severity', 'category', 'version', 'due_date', 'status'];
+    protected $fillable = ['type', 'subject', 'description', 'priority', 'severity', 'category', 'version', 'due_date', 'status', 'post_user_id', 'assigned_user_id'];
 
     public function project()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(\App\Project::class);
     }
 
-    public function users()
+    public function postedUser()
     {
-        return $this->belongsToMany('User');
+        return $this->belongsTo(\App\User::class);
+    }
+
+    public function assignedUser()
+    {
+        return $this->belongsTo(\App\User::class);
     }
 }

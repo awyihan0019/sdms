@@ -39,11 +39,16 @@ class User extends Authenticatable
 
     public function projects()
     {
-        return $this->belongsToMany('Project');
+        return $this->belongsToMany(Project::class)->withTimeStamps();
     }
 
-    public function issues()
+    public function postedIssue()
     {
-        return $this->belongsToMany('Issue');
+        return $this->hasMany(\App\Issue::class, 'post_user_id');
+    }
+
+    public function AssignedIssue()
+    {
+        return $this->hasMany(\App\Issue::class, 'assigned_user_id');
     }
 }
