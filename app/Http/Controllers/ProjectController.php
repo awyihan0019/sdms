@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Project;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -13,9 +14,14 @@ class ProjectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
-        //
+        // need_fix: need to do for showing all the project and allow to add them to user
+        $user = Auth::user();
+        $projects = $user->projects()->get()->toArray();
+        // return view('project.index', compact('projects'));
+        return view('home', compact('projects'));
     }
 
     /**
@@ -26,7 +32,7 @@ class ProjectController extends Controller
     public function create()
     {
         //
-        return view('project.create');
+        return view('home');
     }
 
     /**
@@ -61,6 +67,7 @@ class ProjectController extends Controller
     public function show($id)
     {
         //
+        return view('project.show', ['project' => Project::findOrFail($id)]);
     }
 
     /**
@@ -72,6 +79,8 @@ class ProjectController extends Controller
     public function edit($id)
     {
         //
+        $project = Project::find($id);
+        return view('project.edit', compact('project', 'id'));
     }
 
     /**
@@ -84,6 +93,13 @@ class ProjectController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $this->validate($request, [
+            'project_name'    =>  'required'
+        ]);
+        $project = Project::find($id);
+        $project->project_name = $request->get('project_name');
+        $project->save();
+        return redirect('/home')->with('success', 'Data Updated');
     }
 
     /**
@@ -95,5 +111,8 @@ class ProjectController extends Controller
     public function destroy($id)
     {
         //
+        $project = Project::find($id);
+        $project->delete();
+        return redirect()->route('/home')->with('success', 'Data Deleted');
     }
 }

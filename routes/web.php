@@ -12,20 +12,18 @@
 */
 
 Route::get('/', function () {
-
-
     return view('welcome');
 });
+
+Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
 
 Route::resource('project', 'ProjectController');
 
 Route::resource('issue', 'IssueController');
 
+Route::get('project/{id}', 'ProjectController@show');
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');

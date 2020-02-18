@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
+use DB;
 use App\Issue;
+use App\Project;
+
 
 class HomeController extends Controller
 {
@@ -25,6 +29,16 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $user = Auth::user();
+
+        $projects = DB::table('projects')->get()->toArray();
+        $projects = $user->projects()->get()->toArray();
+
+        $issues = DB::table('issues')->get()->toArray();
+        $issues = $user->AssignedIssue()->get()->toArray();
+
+        return view('/home', [
+            'projects' => $projects,
+            'issues' => $issues]);
     }
 }
