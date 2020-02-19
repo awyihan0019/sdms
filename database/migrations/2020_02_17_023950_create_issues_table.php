@@ -17,7 +17,7 @@ class CreateIssuesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('project_id');
             $table->unsignedBigInteger('post_user_id');
-            $table->unsignedBigInteger('assigned_user_id');
+            $table->unsignedBigInteger('assigned_user_id')->default('');
             $table->string('type');
             $table->string('subject');
             $table->text('description');

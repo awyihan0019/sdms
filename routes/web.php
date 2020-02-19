@@ -21,7 +21,19 @@ Route::resource('project', 'ProjectController');
 
 Route::resource('issue', 'IssueController');
 
+Route::get('/issue/create/{project_id}', [
+    'as' => 'issue_create', 'uses' => 'IssueController@create'
+]);
+
+Route::get('project/create_issue', 'IssueController@create');
+
+Route::get('/issue/index/{project_id}', [
+    'as' => 'issue_index', 'uses' => 'IssueController@index'
+]);
+
 Route::get('project/{id}', 'ProjectController@show');
+
+Route::get('project/{id}', 'ProjectController@showIssue');
 
 Auth::routes();
 

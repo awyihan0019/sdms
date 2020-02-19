@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Issue;
+use App\Project;
+use Illuminate\Support\Facades\Auth;
 
 class IssueController extends Controller
 {
@@ -13,9 +15,12 @@ class IssueController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($project_id)
     {
         //
+        $project = Project::find($project_id);
+        $issues = $project->issues()->get()->toArray();
+        return view('home', compact('issues'));
     }
 
     /**
@@ -23,10 +28,10 @@ class IssueController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($project_id)
     {
         //
-        return view('issue.create');
+        return view('issue.create')->with('project_id', $project_id);
     }
 
     /**
@@ -40,6 +45,7 @@ class IssueController extends Controller
         //
         //确认输入所需数据 validate the data input
         $this->validate($request, [
+            'project_id' => 'required',
             'type'    =>  'required',
             'subject'    =>  'required',
             'description'    =>  'required',
@@ -50,7 +56,11 @@ class IssueController extends Controller
             'due_date'    =>  'required'
         ]);
         //创造新variable 并copy 输入的数据
+        $user = Auth::user();
         $issue = new Issue([
+            'project_id'    =>  $request->get('project_id'),
+            'post_user_id'    =>  $user['id'],
+            'assigned_user_id'    =>  '1',
             'type'    =>  $request->get('type'),
             'subject'    =>  $request->get('subject'),
             'description'    =>  $request->get('description'),
@@ -58,12 +68,13 @@ class IssueController extends Controller
             'severity'    =>  $request->get('severity'),
             'category'    =>  $request->get('category'),
             'version'    =>  $request->get('version'),
+            'status'    =>  'open',
             'due_date'    =>  $request->get('due_date')
         ]);
         //储存数据
         $issue->save();
         //返回页面
-        return redirect()->route('issue.create')->with('success', 'Data Added');
+        return view('project.show', ['project' => Project::findOrFail($request->get('project_id'))])->with('success', 'data added');
     }
 
     /**

@@ -20,7 +20,6 @@ class ProjectController extends Controller
         // need_fix: need to do for showing all the project and allow to add them to user
         $user = Auth::user();
         $projects = $user->projects()->get()->toArray();
-        // return view('project.index', compact('projects'));
         return view('home', compact('projects'));
     }
 
@@ -32,7 +31,7 @@ class ProjectController extends Controller
     public function create()
     {
         //
-        return view('home');
+        return view('project.create');
     }
 
     /**
@@ -53,9 +52,13 @@ class ProjectController extends Controller
             'project_name'    =>  $request->get('project_name'),
         ]);
         //储存数据
+        $user = Auth::user();
+
         $project->save();
+        $user->projects()->attach($project);
+
         //返回页面
-        return redirect()->route('project.create')->with('success', 'Data Added');
+        return redirect('/home')->with('success', 'Data Added');
     }
 
     /**
@@ -67,7 +70,15 @@ class ProjectController extends Controller
     public function show($id)
     {
         //
-        return view('project.show', ['project' => Project::findOrFail($id)]);
+        $project = Project::find($id);
+        return view('project.show', ['project' => Project::findOrFail($id)], compact('project', 'id'));
+    }
+
+    public function showIssue($id)
+    {
+        $project = Project::find($id);
+        $issues = $project->issues()->get()->toArray();
+        return view('project.show', compact('issues', 'id'));
     }
 
     /**
@@ -114,5 +125,10 @@ class ProjectController extends Controller
         $project = Project::find($id);
         $project->delete();
         return redirect()->route('/home')->with('success', 'Data Deleted');
+    }
+
+    public function createNewIssue($id)
+    {
+        # code...
     }
 }

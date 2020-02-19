@@ -1,8 +1,5 @@
 @extends('layouts.app')
-@php
-@endphp
 @section('content')
-
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -40,6 +37,7 @@
                 <div class="card-body">
                     <table class="table table-bordered table-striped">
                         <tr>
+                         <th style="width:20px;text-align: center;">ID</th>
                          <th>Subject</th>
                          <th style="width:40px">Priority</th>
                          <th style="width:40px">Status</th>
@@ -47,6 +45,7 @@
                         </tr>
                         @foreach($issues as $row)
                         <tr>
+                            <td>{{$row['id']}}</td>
                             <td>{{$row['subject']}}</td>
                             <td>{{$row['priority']}}</td>
                             <td>{{$row['status']}}</td>
