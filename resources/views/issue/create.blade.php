@@ -1,4 +1,6 @@
-@extends('sample')
+@extends('layouts.app')
+
+@include('project_navbar')
 
 @section('content')
 <div class="row">

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Issue;
 use App\Project;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 
 class IssueController extends Controller
@@ -20,7 +21,7 @@ class IssueController extends Controller
         //
         $project = Project::find($project_id);
         $issues = $project->issues()->get()->toArray();
-        return view('home', compact('issues'));
+        return view('issue.index', compact('issues', 'project'));
     }
 
     /**
@@ -31,7 +32,8 @@ class IssueController extends Controller
     public function create($project_id)
     {
         //
-        return view('issue.create')->with('project_id', $project_id);
+        $project = Project::find($project_id);
+        return view('project.create_issue')->with('project', $project);
     }
 
     /**
@@ -52,15 +54,13 @@ class IssueController extends Controller
             'priority'    =>  'required',
             'severity'    =>  'required',
             'category'    =>  'required',
-            'version'    =>  'required',
-            'due_date'    =>  'required'
+            'version'    =>  'required'
         ]);
         //创造新variable 并copy 输入的数据
         $user = Auth::user();
         $issue = new Issue([
             'project_id'    =>  $request->get('project_id'),
             'post_user_id'    =>  $user['id'],
-            'assigned_user_id'    =>  '1',
             'type'    =>  $request->get('type'),
             'subject'    =>  $request->get('subject'),
             'description'    =>  $request->get('description'),
@@ -68,13 +68,14 @@ class IssueController extends Controller
             'severity'    =>  $request->get('severity'),
             'category'    =>  $request->get('category'),
             'version'    =>  $request->get('version'),
-            'status'    =>  'open',
-            'due_date'    =>  $request->get('due_date')
+            'status'    =>  'open'
         ]);
         //储存数据
         $issue->save();
+        $project = Project::findOrFail($request->get('project_id'));
+        $issues = $project->issues()->get()->toArray();
         //返回页面
-        return view('project.show', ['project' => Project::findOrFail($request->get('project_id'))])->with('success', 'data added');
+        return view('issue.index', ['project' => Project::findOrFail($request->get('project_id'))])->with('issues', $issues);
     }
 
     /**
@@ -86,6 +87,10 @@ class IssueController extends Controller
     public function show($id)
     {
         //
+        $issue = Issue::find($id);
+        $project = $issue->project()->get()->first();
+        $users = $project->users()->get()->toArray();
+        return view('issue.edit', ['issue' => Issue::findOrFail($id)], compact('issue', 'id', 'project', 'users'));
     }
 
     /**

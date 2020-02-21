@@ -17,7 +17,7 @@ class CreateIssuesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('project_id');
             $table->unsignedBigInteger('post_user_id');
-            $table->unsignedBigInteger('assigned_user_id')->default('');
+            $table->unsignedBigInteger('assigned_user_id')->nullable();
             $table->string('type');
             $table->string('subject');
             $table->text('description');
@@ -25,7 +25,7 @@ class CreateIssuesTable extends Migration
             $table->string('severity');
             $table->string('category');
             $table->string('version');
-            $table->date('due_date');
+            $table->date('due_date')->nullable();
             $table->string('status');
             $table->timestamps();
         });

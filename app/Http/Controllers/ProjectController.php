@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Project;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
@@ -127,8 +128,21 @@ class ProjectController extends Controller
         return redirect()->route('/home')->with('success', 'Data Deleted');
     }
 
-    public function createNewIssue($id)
+    public function addMember($project_id)
     {
-        # code...
+        $project = Project::find($project_id);
+        $project_members = $project->users()->get()->toArray();
+        $all_users = User::all()->toArray();
+        $count = 0;
+        foreach($all_users as $user){
+            foreach($project_members as $member){
+                if($user['id'] == $member['id']){
+                    unset($all_users[$count]);
+                }
+                $count++;
+            }
+        }
+        $users = $all_users;
+        return view('project.add_member', compact('project', 'users'));
     }
 }
