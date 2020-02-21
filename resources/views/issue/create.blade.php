@@ -1,4 +1,6 @@
-@extends('sample')
+@extends('layouts.app')
+
+@include('project_navbar')
 
 @section('content')
 <div class="row">
@@ -71,6 +73,9 @@
    <div class="form-group">
     <input type="submit" class="btn btn-primary" />
    </div>
+   <div class="form-group">
+    <input type="hidden" name="project_id" value="{{ $project_id }}">
+    </div>
   </form>
 
     <!-- form end here -->
