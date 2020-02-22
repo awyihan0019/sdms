@@ -9,4 +9,23 @@
     <div>
         <h1>{{$project['project_name']}}</h1>
     </div>
+    <div class="card">
+        <div class="card-header">Member</div>
+        @if (empty($users))
+        <div class="card-body">
+            <div>No any user found</div>
+        </div>
+        @else
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                @foreach($users ?? '' as $row)
+                <tr>
+                    <td>{{$row['name']}}
+                    </td>
+                </tr>
+                @endforeach
+            </table>
+        </div>
+        @endif
+    </div>
 @endsection

@@ -29,17 +29,28 @@ Route::get('/project/add_member/{project_id}', [
     'as' => 'add_member', 'uses' => 'ProjectController@addMember'
 ]);
 
+Route::post('/project/store_member/{project_id}', [
+    'as' => 'store_member', 'uses' => 'ProjectController@storeMember'
+]);
+
+
 Route::get('/issue/index/{project_id}', [
     'as' => 'issue_index', 'uses' => 'IssueController@index'
 ]);
 
 Route::get('/issue/edit/{issue_id}', [
-    'as' => 'issue_edit', 'uses' => 'IssueController@show'
+    'as' => 'issue_edit', 'uses' => 'IssueController@edit'
 ]);
 
-Route::get('project/{id}', 'ProjectController@show');
+Route::get('project/{id}', [
+    'as' => 'currentProject', 'uses' => 'ProjectController@show'
+]);
 
 Route::get('project/{id}', 'ProjectController@showIssue');
+
+// Route::get('/issue/{issue_id}/comment', [
+//     'as' => 'comment', 'uses' => 'CommentController@create'
+// ]);
 
 Auth::routes();
 

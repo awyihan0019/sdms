@@ -23,4 +23,9 @@ class Issue extends Model
     {
         return $this->belongsTo(\App\User::class);
     }
+
+    public function comments()
+    {
+        return $this->hasMany(\App\Comment::class, 'issue_id');
+    }
 }

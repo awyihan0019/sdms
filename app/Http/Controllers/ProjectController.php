@@ -72,7 +72,8 @@ class ProjectController extends Controller
     {
         //
         $project = Project::find($id);
-        return view('project.show', ['project' => Project::findOrFail($id)], compact('project', 'id'));
+        $users = $project->users()->get()->toArray();
+        return view('project.show', ['project' => Project::findOrFail($id)], compact('project', 'id', 'users'));
     }
 
     public function showIssue($id)
@@ -130,19 +131,34 @@ class ProjectController extends Controller
 
     public function addMember($project_id)
     {
-        $project = Project::find($project_id);
-        $project_members = $project->users()->get()->toArray();
-        $all_users = User::all()->toArray();
-        $count = 0;
-        foreach($all_users as $user){
+        $project = Project::findOrFail($project_id);
+        return view('project.add_member', compact('project'));
+    }
+
+    public function storeMember(Request $request)
+    {
+        // dd($request);
+        // //创造新variable 并copy 输入的数据
+        $email = $request->input('email');
+        $project_id = $request->input('project_id');
+        // //储存数据
+        $user = User::where('email',$email) -> first();
+        if(empty($user)){
+            return redirect()->back()->with('error', 'The email not found in used');
+        }else{
+            $project = Project::findOrFail($project_id);
+
+            $project_members = $project->users()->get()->toArray();
+
             foreach($project_members as $member){
-                if($user['id'] == $member['id']){
-                    unset($all_users[$count]);
+                if($member['email'] == $email){
+                    return redirect()->back()->with('error', 'The member is already added');
                 }
-                $count++;
             }
+
+            $user->projects()->attach($project);
         }
-        $users = $all_users;
-        return view('project.add_member', compact('project', 'users'));
+        //返回页面
+        return redirect('/home');
     }
 }

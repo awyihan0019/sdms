@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Mail\UpdateHistory;
+use Illuminate\Support\Facades\Mail;
+
 use App\Issue;
 use App\Project;
 use App\User;
@@ -87,10 +90,7 @@ class IssueController extends Controller
     public function show($id)
     {
         //
-        $issue = Issue::find($id);
-        $project = $issue->project()->get()->first();
-        $users = $project->users()->get()->toArray();
-        return view('issue.edit', ['issue' => Issue::findOrFail($id)], compact('issue', 'id', 'project', 'users'));
+
     }
 
     /**
@@ -102,6 +102,11 @@ class IssueController extends Controller
     public function edit($id)
     {
         //
+        $issue = Issue::find($id);
+        $project = $issue->project()->get()->first();
+        $users = $project->users()->get()->toArray(); //using for show assignee
+        $project_members = $project->users()->get()->toArray();
+        return view('issue.edit', ['issue' => Issue::findOrFail($id)], compact('issue', 'id', 'project','project_members', 'users'));
     }
 
     /**
@@ -114,6 +119,33 @@ class IssueController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $this->validate($request, [
+            'type'    =>  'required',
+            'subject'    =>  'required',
+            'description'    =>  'required',
+            'priority'    =>  'required',
+            'severity'    =>  'required',
+            'category'    =>  'required',
+            'version'    =>  'required'
+        ]);
+
+        $issue = Issue::find($id);
+
+        $issue->type = $request->get('type');
+        $issue->subject = $request->get('subject');
+        $issue->description = $request->get('description');
+        $issue->priority = $request->get('priority');
+        $issue->severity = $request->get('severity');
+        $issue->category = $request->get('category');
+        $issue->version = $request->get('version');
+        $issue->due_date = $request->get('due_date');
+        $issue->assigned_user_id = $request->get('assigned_user_id');
+
+        $issue->save();
+
+        Mail::to($request->user())->send(new UpdateHistory());
+
+        return redirect('/home')->with('success', 'Data Updated');
     }
 
     /**

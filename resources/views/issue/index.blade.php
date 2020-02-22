@@ -28,10 +28,10 @@
                     <tr>
                         <td>{{$row['type']}}</td>
                         <td><a href="{{route('issue_edit', ['issue_id'=>$row['id']])}}">{{$row['subject']}}</a></td>
-                        @if (empty($row['assigned_id']))
+                        @if (empty($row['assigned_user_id']))
                         <td>Not set</td>
                         @else
-                        <td>{{ $row['assigned_id'] }}</td>
+                        <td>{{ $row['assigned_user_id'] }}</td>
                         @endif
                         <td>{{$row['status']}}</td>
                         <td>{{$row['priority']}}</td>

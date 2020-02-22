@@ -51,4 +51,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Issue::class, 'assigned_user_id');
     }
+
+    public function comments()
+    {
+        return $this->hasMany(\App\Comment::class, 'comment_user_id');
+    }
 }
