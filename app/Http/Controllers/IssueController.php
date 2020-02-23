@@ -104,9 +104,10 @@ class IssueController extends Controller
         //
         $issue = Issue::find($id);
         $project = $issue->project()->get()->first();
+        $comments = $issue->comments()->get();
         $users = $project->users()->get()->toArray(); //using for show assignee
         $project_members = $project->users()->get()->toArray();
-        return view('issue.edit', ['issue' => Issue::findOrFail($id)], compact('issue', 'id', 'project','project_members', 'users'));
+        return view('issue.edit', ['issue' => Issue::findOrFail($id)], compact('issue', 'id', 'project','project_members', 'users', 'comments'));
     }
 
     /**
@@ -126,7 +127,8 @@ class IssueController extends Controller
             'priority'    =>  'required',
             'severity'    =>  'required',
             'category'    =>  'required',
-            'version'    =>  'required'
+            'version'    =>  'required',
+            'status'    =>  'required'
         ]);
 
         $issue = Issue::find($id);
@@ -140,6 +142,7 @@ class IssueController extends Controller
         $issue->version = $request->get('version');
         $issue->due_date = $request->get('due_date');
         $issue->assigned_user_id = $request->get('assigned_user_id');
+        $issue->status = $request->get('status');
 
         $issue->save();
 

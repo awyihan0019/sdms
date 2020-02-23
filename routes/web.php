@@ -19,6 +19,8 @@ Route::resource('project', 'ProjectController');
 
 Route::resource('issue', 'IssueController');
 
+Route::resource('comment', 'CommentController');
+
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
 
 Route::get('/project/create_issue/{project_id}', [
@@ -44,6 +46,10 @@ Route::get('/issue/edit/{issue_id}', [
 
 Route::get('project/{id}', [
     'as' => 'currentProject', 'uses' => 'ProjectController@show'
+]);
+
+Route::get('/issue/comment/{issue_id}', [
+    'as' => 'add_comment', 'uses' => 'CommentController@create'
 ]);
 
 Route::get('project/{id}', 'ProjectController@showIssue');

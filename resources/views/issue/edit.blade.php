@@ -103,14 +103,14 @@
                         <select type="text" name="category" class="form-control">
                             <option value="" disabled></option>
                             @if ($issue['category'] == 'UI')
-                            <option value="UI" selected>User Interface</option>
+                            <option value="UI" selected>Open</option>
                             @else
-                            <option value="UI">User Interface</option>
+                            <option value="UI">Open</option>
                             @endif
                             @if ($issue['category'] == 'Func')
-                            <option value="Func" selected>Functionality</option>
+                            <option value="Func" selected>In Progress</option>
                             @else
-                            <option value="Func">Functionality</option>
+                            <option value="Func">In Progress</option>
                             @endif
                             @if ($issue['category'] == 'DB')
                             <option value="DB" selected>Database</option>
@@ -143,20 +143,72 @@
                         </select>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label for="description">Status</label>
+                        <select type="text" name="status" class="form-control">
+                            <option value="" disabled></option>
+                            @if ($issue['status'] == 'open')
+                            <option value="open" selected>Open</option>
+                            @else
+                            <option value="open">Open</option>
+                            @endif
+                            @if ($issue['status'] == 'in_progress')
+                            <option value="in_progress" selected>In Progress</option>
+                            @else
+                            <option value="in_progress">In Progress</option>
+                            @endif
+                            @if ($issue['status'] == 'resolved')
+                            <option value="resolved" selected>Resolved</option>
+                            @else
+                            <option value="resolved">Resolved</option>
+                            @endif
+                            @if ($issue['status'] == 'closed')
+                            <option value="closed" selected>Closed</option>
+                            @else
+                            <option value="closed">Closed</option>
+                            @endif
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="exampleFormControlFile1">External File</label>
+                        <input type="file" class="form-control-file" id="exampleFormControlFile1">
+                    </div>
+                </div>
                 <div class="form-group">
                     <input type="hidden" name="project_id" value="{{ $project['id'] }}">
                 </div>
                 <div class="form-group">
-                    <input type="submit" class="btn btn-primary" value="Edit" />
+                    <input type="submit" class="btn btn-primary" aglin="right" value="Update Issue" />
                 </div>
             </form>
         </div>
     </div>
-    <div class="row" style="margin-left:200px; width:70%">
-        <div class="col-md-12">
-            <h2>Comment</h2>
-            {{-- <a href="{{route('comment', ['issue_id'=>$issue['id']])}}" class="btn btn-warning float-right" align="right">Comment</a> --}}
+    <hr>
+    <div style="margin-left:200px; width:70%">
+        <h2 class="reviews">Comment <a href="{{route('add_comment', ['issue_id'=>$issue['id']])}}"
+                class="btn btn-secondary float-right">Add Comment</a></h2>
+        <br>
+        @if (empty($comments))
+        <div class="card">
+            <div class="card-body">
+                <div>
+                    <p class="card-text">No any comment found.</p>
+                </div>
+            </div>
         </div>
-
+        @else
+        @foreach($comments ?? '' as $row)
+        <div class="card">
+            <div class="card-body">
+                <div>
+                    <h5 class="card-title">{{$row['comment_user_id']}}</h5>
+                    <p class="card-text">{{$row['content']}}</p>
+                </div>
+            </div>
+            <div class="card-footer text-muted">{{$row['created_at']}}</div>
+        </div>
+        @endforeach
+        @endif
     </div>
     @endsection

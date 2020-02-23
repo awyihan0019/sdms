@@ -4,28 +4,29 @@
 
 @section('content')
 
-<div class="container" style="margin-left:150px">
-    <a href="{{route('add_member', ['project_id'=>$project['id']])}}" class="btn btn-warning float-right" align="right">Add Member</a>
+<div class="container" style="margin-left:200px; width:100%">
+    <a href="{{route('add_member', ['project_id'=>$project['id']])}}" class="btn btn-secondary float-right">Invite
+        User</a>
     <div>
         <h1>{{$project['project_name']}}</h1>
     </div>
-    <div class="card">
-        <div class="card-header">Member</div>
-        @if (empty($users))
-        <div class="card-body">
-            <div>No any user found</div>
+    <div class="row">
+        <div class=" col" style="width: 70%;">
+            all the history log will show at here
         </div>
-        @else
-        <div class="card-body">
-            <table class="table table-bordered table-striped">
-                @foreach($users ?? '' as $row)
-                <tr>
-                    <td>{{$row['name']}}
-                    </td>
-                </tr>
-                @endforeach
-            </table>
+        <div class="col">
+            <div class="card" style="width: 10rem;">
+                <div class="card-header">Member</div>
+                <ul class="list-group list-group-flush">
+                    @if (empty($users))
+                    <li class="list-group-item">No any user found</li>
+                    @else
+                    @foreach($users ?? '' as $row)
+                    <li class="list-group-item">{{$row['name']}}</li>
+                    @endforeach
+                    @endif
+                </ul>
+            </div>
         </div>
-        @endif
     </div>
-@endsection
+    @endsection

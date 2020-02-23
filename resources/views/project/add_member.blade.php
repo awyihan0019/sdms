@@ -4,7 +4,7 @@
 
 @section('content')
 
-<a href="{{action('ProjectController@create')}}" class="btn btn-warning">Add Member</a>
+<a href="{{action('ProjectController@create')}}" class="btn btn-secondary">Add Member</a>
 <div class="container" style="margin-left:150px">
     <div>
         <h1>{{$project['project_name']}}</h1>

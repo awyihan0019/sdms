@@ -37,8 +37,7 @@ class HomeController extends Controller
         $allIssues = DB::table('issues')->get()->toArray();
         $assignedIssues = $user->AssignedIssue()->get()->toArray();
         $postedIssues = $user->postedIssue()->get()->toArray();
-        $issues = array_merge($assignedIssues, $postedIssues);
-
+        $issues = array_merge($assignedIssues, $postedIssues); //here have some problem fix
         return view('/home', [
             'projects' => $projects,
             'issues' => $issues]);
