@@ -11,11 +11,16 @@ class Comment extends Model
 
     public function commented_user()
     {
-        return $this->belongsTo(\App\User::class);
+        return $this->belongsTo(\App\User::class, 'comment_user_id');
     }
 
     public function issue()
     {
-        return $this->belongsTo(\App\Issue::class);
+        return $this->belongsTo(\App\Issue::class, 'issue_id');
+    }
+
+    public function history()
+    {
+        return $this->hasOne(\App\History::class);
     }
 }

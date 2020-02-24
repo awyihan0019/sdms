@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Issue;
 use App\User;
 use App\Comment;
+use App\History;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
@@ -59,6 +60,25 @@ class CommentController extends Controller
         //储存数据
 
         $comment->save();
+
+         //create history
+         $user_name = $user['name'];
+         $issue = $comment->issue()->get()->first();
+         $project = $issue->project()->get()->first();
+         $project_name = $project['project_name'];
+         $issue_id = $issue['id'];
+
+         $action_log = "$user_name had been comment to issue $issue_id in $project_name";
+
+         $history = new History([
+             'user_id'   =>  $user['id'],
+             'project_id'    => $project['id'],
+             'issue_id'    => $issue['id'],
+             'comment_id'    => $comment['id'],
+             'action_log'    =>  $action_log
+         ]);
+
+         $history->save();
 
         //返回页面
         return redirect('/home')->with('success', 'Data Added');

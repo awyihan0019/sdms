@@ -202,7 +202,7 @@
         <div class="card">
             <div class="card-body">
                 <div>
-                    <h5 class="card-title">{{$row['comment_user_id']}}</h5>
+                    <h5 class="card-title">{{ $row->commented_user()->first()['name'] }}</h5>
                     <p class="card-text">{{$row['content']}}</p>
                 </div>
             </div>

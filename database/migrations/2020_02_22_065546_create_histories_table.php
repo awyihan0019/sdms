@@ -19,7 +19,7 @@ class CreateHistoriesTable extends Migration
             $table->unsignedBigInteger('issue_id')->nullable();
             $table->unsignedBigInteger('project_id')->nullable();
             $table->unsignedBigInteger('comment_id')->nullable();
-            $table->text('action');
+            $table->text('action_log');
             $table->timestamps();
         });
     }

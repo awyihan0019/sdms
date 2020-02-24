@@ -11,10 +11,27 @@
         <h1>{{$project['project_name']}}</h1>
     </div>
     <div class="row">
-        <div class=" col" style="width: 70%;">
-            all the history log will show at here
+        <div class="col-md-12 col-sm-12 col-xl-10">
+            <div class="card">
+                <div class="card-header"><a data-toggle="collapse" data-target="#show_histories" aria-expanded="false"
+                        aria-controls="collapseOne">Dashboard<i class="fas fa-chevron-down fa-fw"></i></div>
+            </div>
+            <div id="show_histories" class="collapse in show">
+                @if (empty($histories))
+                <p>No history found</p>
+                @else
+                @foreach ($histories as $row)
+                <div class="card bg-light mb-3">
+                    <div class="card-header">{{ $row['created_at'] }}</div>
+                    <div class="card-body">
+                        <p class="card-text">{{ $row['action_log'] }}</p>
+                    </div>
+                </div>
+                @endforeach
+                @endif
+            </div>
         </div>
-        <div class="col">
+        <div class="col-md-12 col-sm-12 col-xl-1">
             <div class="card" style="width: 10rem;">
                 <div class="card-header">Member</div>
                 <ul class="list-group list-group-flush">

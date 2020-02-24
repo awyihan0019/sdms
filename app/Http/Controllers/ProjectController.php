@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Project;
 use App\User;
+use App\History;
 use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
@@ -58,6 +59,18 @@ class ProjectController extends Controller
         $project->save();
         $user->projects()->attach($project);
 
+        $user_name = $user['name'];
+        $project_name = $project['project_name'];
+        $action_log = "$user_name create a project $project_name";
+
+        $history = new History([
+            'user_id'   =>  $user['id'],
+            'project_id'    => $project['id'],
+            'action_log'    =>  $action_log
+        ]);
+
+        $history->save();
+
         //返回页面
         return redirect('/home')->with('success', 'Data Added');
     }
@@ -73,7 +86,8 @@ class ProjectController extends Controller
         //
         $project = Project::find($id);
         $users = $project->users()->get()->toArray();
-        return view('project.show', ['project' => Project::findOrFail($id)], compact('project', 'id', 'users'));
+        $histories = $project->histories()->get()->sortByDesc('created_at')->toArray();
+        return view('project.show', ['project' => Project::findOrFail($id)], compact('project', 'id', 'users', 'histories'));
     }
 
     public function showIssue($id)
@@ -157,6 +171,20 @@ class ProjectController extends Controller
             }
 
             $user->projects()->attach($project);
+
+            //add history
+            $user_name = $user['name'];
+            $project_name = $project['project_name'];
+
+            $action_log = "$project_name has been added a new member $user_name";
+
+            $history = new History([
+                'user_id'   =>  $user['id'],
+                'project_id'    => $project['id'],
+                'action_log'    =>  $action_log
+            ]);
+
+            $history->save();
         }
         //返回页面
         return redirect('/home');

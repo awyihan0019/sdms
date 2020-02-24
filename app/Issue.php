@@ -26,6 +26,11 @@ class Issue extends Model
 
     public function comments()
     {
-        return $this->hasMany(\App\Comment::class, 'issue_id');
+        return $this->hasMany(\App\Comment::class);
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(\App\History::class);
     }
 }

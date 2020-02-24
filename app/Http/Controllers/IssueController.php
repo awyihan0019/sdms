@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Issue;
 use App\Project;
 use App\User;
+use App\History;
 use Illuminate\Support\Facades\Auth;
 
 class IssueController extends Controller
@@ -77,6 +78,23 @@ class IssueController extends Controller
         $issue->save();
         $project = Project::findOrFail($request->get('project_id'));
         $issues = $project->issues()->get()->toArray();
+
+        //create history
+        $user_name = $user['name'];
+        $project_name = $project['project_name'];
+        $issue_id = $issue['id'];
+
+        $action_log = "$user_name add a new issue $issue_id for $project_name";
+
+        $history = new History([
+            'user_id'   =>  $user['id'],
+            'project_id'    => $project['id'],
+            'issue_id'    => $issue['id'],
+            'action_log'    =>  $action_log
+        ]);
+
+        $history->save();
+
         //返回页面
         return view('issue.index', ['project' => Project::findOrFail($request->get('project_id'))])->with('issues', $issues);
     }
@@ -107,6 +125,7 @@ class IssueController extends Controller
         $comments = $issue->comments()->get();
         $users = $project->users()->get()->toArray(); //using for show assignee
         $project_members = $project->users()->get()->toArray();
+
         return view('issue.edit', ['issue' => Issue::findOrFail($id)], compact('issue', 'id', 'project','project_members', 'users', 'comments'));
     }
 
@@ -147,6 +166,24 @@ class IssueController extends Controller
         $issue->save();
 
         Mail::to($request->user())->send(new UpdateHistory());
+
+        //create history
+        $user = Auth::user();
+        $user_name = $user['name'];
+        $project = $issue->project()->get()->first();
+        $project_name = $project['project_name'];
+        $issue_id = $issue['id'];
+
+        $action_log = "$user_name had been edited issue $issue_id in $project_name";
+
+        $history = new History([
+            'user_id'   =>  $user['id'],
+            'project_id'    => $project['id'],
+            'issue_id'    => $issue['id'],
+            'action_log'    =>  $action_log
+        ]);
+
+        $history->save();
 
         return redirect('/home')->with('success', 'Data Updated');
     }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use DB;
 use App\Issue;
 use App\Project;
+use App\History;
 
 
 class HomeController extends Controller
@@ -38,8 +39,11 @@ class HomeController extends Controller
         $assignedIssues = $user->AssignedIssue()->get()->toArray();
         $postedIssues = $user->postedIssue()->get()->toArray();
         $issues = array_merge($assignedIssues, $postedIssues); //here have some problem fix
+
+        $histories = $user->histories()->get()->sortByDesc('created_at')->toArray();
         return view('/home', [
             'projects' => $projects,
-            'issues' => $issues]);
+            'issues' => $issues,
+            'histories' => $histories]);
     }
 }

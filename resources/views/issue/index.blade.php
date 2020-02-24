@@ -34,7 +34,13 @@
             <td>{{ $row['assigned_user_id'] }}</td>
             @endif
             <td>{{$row['status']}}</td>
-            <td>{{$row['priority']}}</td>
+            @if ($row['priority'] == "high")
+            <td class="text-danger">High</td>
+            @elseif($row['priority'] == "normal")
+            <td class="text-primary">Normal</td>
+            @elseif($row['priority'] == "low")
+            <td class="text-success">Low</td>
+            @endif
             @if (empty($row['due_date']))
             <td>Not set</td>
             @else

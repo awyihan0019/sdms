@@ -18,4 +18,9 @@ class Project extends Model
     {
         return $this->hasMany(\App\Issue::class);
     }
+
+    public function histories()
+    {
+        return $this->hasMany(\App\History::class);
+    }
 }
