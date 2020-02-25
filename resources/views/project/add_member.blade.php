@@ -13,9 +13,6 @@
     <div>
         <h2>Add New Member</h2>
     </div>
-    {{-- @php
-        dd($project)
-    @endphp --}}
 
     @if(count($errors) > 0)
         <div class="alert alert-danger">

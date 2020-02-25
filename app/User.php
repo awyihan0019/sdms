@@ -39,7 +39,7 @@ class User extends Authenticatable
 
     public function projects()
     {
-        return $this->belongsToMany(Project::class)->withTimeStamps();
+        return $this->belongsToMany(\App\Project::class)->withTimeStamps();
     }
 
     public function postedIssue()
@@ -54,11 +54,16 @@ class User extends Authenticatable
 
     public function comments()
     {
-        return $this->hasMany(\App\Comment::class, 'comment_user_id');
+        return $this->hasMany(\App\Comment::class);
     }
 
     public function histories()
     {
         return $this->hasMany(\App\History::class, 'user_id');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(\App\Attachment::class, 'uploaded_user_id');
     }
 }

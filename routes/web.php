@@ -21,11 +21,7 @@ Route::resource('issue', 'IssueController');
 
 Route::resource('comment', 'CommentController');
 
-Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
-
-Route::get('/project/create_issue/{project_id}', [
-    'as' => 'create_issue', 'uses' => 'IssueController@create'
-]);
+//Project Controller
 
 Route::get('/project/add_member/{project_id}', [
     'as' => 'add_member', 'uses' => 'ProjectController@addMember'
@@ -35,6 +31,13 @@ Route::post('/project/store_member/{project_id}', [
     'as' => 'store_member', 'uses' => 'ProjectController@storeMember'
 ]);
 
+Route::get('project/{id}', [
+    'as' => 'currentProject', 'uses' => 'ProjectController@show'
+]);
+
+Route::get('project/{id}', 'ProjectController@showIssue');
+
+//Issue Controller
 
 Route::get('/issue/index/{project_id}', [
     'as' => 'issue_index', 'uses' => 'IssueController@index'
@@ -44,19 +47,21 @@ Route::get('/issue/edit/{issue_id}', [
     'as' => 'issue_edit', 'uses' => 'IssueController@edit'
 ]);
 
-Route::get('project/{id}', [
-    'as' => 'currentProject', 'uses' => 'ProjectController@show'
+Route::get('/issue/show/{issue_id}', [
+    'as' => 'issue_show', 'uses' => 'IssueController@show'
 ]);
+
+Route::get('/project/create_issue/{project_id}', [
+    'as' => 'create_issue', 'uses' => 'IssueController@create'
+]);
+
+Route::post('/attachFile/{id}', 'IssueController@attachFile');
+
+
 
 Route::get('/issue/comment/{issue_id}', [
     'as' => 'add_comment', 'uses' => 'CommentController@create'
 ]);
-
-Route::get('project/{id}', 'ProjectController@showIssue');
-
-// Route::get('/issue/{issue_id}/comment', [
-//     'as' => 'comment', 'uses' => 'CommentController@create'
-// ]);
 
 Auth::routes();
 

@@ -85,8 +85,8 @@ class ProjectController extends Controller
     {
         //
         $project = Project::find($id);
-        $users = $project->users()->get()->toArray();
-        $histories = $project->histories()->get()->sortByDesc('created_at')->toArray();
+        $users = $project->users()->get();
+        $histories = $project->histories()->get()->sortByDesc('created_at');
         return view('project.show', ['project' => Project::findOrFail($id)], compact('project', 'id', 'users', 'histories'));
     }
 
@@ -151,7 +151,6 @@ class ProjectController extends Controller
 
     public function storeMember(Request $request)
     {
-        // dd($request);
         // //创造新variable 并copy 输入的数据
         $email = $request->input('email');
         $project_id = $request->input('project_id');

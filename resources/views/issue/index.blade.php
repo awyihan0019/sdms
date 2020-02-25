@@ -24,14 +24,15 @@
                 <th style="width:100px">Due Date</th>
             </thead>
         </tr>
+        @if ($check = $issues->first() != null)
         @foreach ($issues as $row)
         <tr>
             <td>{{$row['type']}}</td>
-            <td><a href="{{route('issue_edit', ['issue_id'=>$row['id']])}}">{{$row['subject']}}</a></td>
+            <td><a href="{!! route('issue_show',['issue_id'=>$row['id']]) !!}">{{$row['subject']}}</a></td>
             @if (empty($row['assigned_user_id']))
             <td>Not set</td>
             @else
-            <td>{{ $row['assigned_user_id'] }}</td>
+            <td>{{ $row->assignedUser()->first()['name'] }}</td>
             @endif
             <td>{{$row['status']}}</td>
             @if ($row['priority'] == "high")
@@ -48,12 +49,14 @@
             @endif
         </tr>
         @endforeach
+        @else
+        <tr>
+            <td colspan="6">No any issue added</td>
+        </tr>
+        @endif
     </table>
-    @if (empty($issues))
-    <p>No issue found.</p>
-    @endif
 </div>
-
+{{--
 <script>
     document.addEventListener("DOMContentLoaded",() => {
         const rows = document.querySelectorAll("tr[data-herf]");
@@ -64,5 +67,5 @@
             })
         })
     })
-</script>
+</script> --}}
 @endsection

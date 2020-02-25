@@ -17,9 +17,7 @@
                         aria-controls="collapseOne">Dashboard<i class="fas fa-chevron-down fa-fw"></i></div>
             </div>
             <div id="show_histories" class="collapse in show">
-                @if (empty($histories))
-                <p>No history found</p>
-                @else
+                @if ($histories->first()  != null)
                 @foreach ($histories as $row)
                 <div class="card bg-light mb-3">
                     <div class="card-header">{{ $row['created_at'] }}</div>
@@ -28,6 +26,8 @@
                     </div>
                 </div>
                 @endforeach
+                @else
+                <p>No history found</p>
                 @endif
             </div>
         </div>
@@ -35,12 +35,12 @@
             <div class="card" style="width: 10rem;">
                 <div class="card-header">Member</div>
                 <ul class="list-group list-group-flush">
-                    @if (empty($users))
-                    <li class="list-group-item">No any user found</li>
-                    @else
+                    @if ($users->first()  != null)
                     @foreach($users ?? '' as $row)
                     <li class="list-group-item">{{$row['name']}}</li>
                     @endforeach
+                    @else
+                    <li class="list-group-item">No any user found</li>
                     @endif
                 </ul>
             </div>

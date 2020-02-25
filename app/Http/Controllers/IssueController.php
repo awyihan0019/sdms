@@ -11,6 +11,7 @@ use App\Issue;
 use App\Project;
 use App\User;
 use App\History;
+use App\Attachment;
 use Illuminate\Support\Facades\Auth;
 
 class IssueController extends Controller
@@ -24,7 +25,7 @@ class IssueController extends Controller
     {
         //
         $project = Project::find($project_id);
-        $issues = $project->issues()->get()->toArray();
+        $issues = $project->issues()->get();
         return view('issue.index', compact('issues', 'project'));
     }
 
@@ -50,6 +51,8 @@ class IssueController extends Controller
     {
         //
         //确认输入所需数据 validate the data input
+
+        //valite input data
         $this->validate($request, [
             'project_id' => 'required',
             'type'    =>  'required',
@@ -72,12 +75,12 @@ class IssueController extends Controller
             'severity'    =>  $request->get('severity'),
             'category'    =>  $request->get('category'),
             'version'    =>  $request->get('version'),
-            'status'    =>  'open'
+            'status'    =>  'Open'
         ]);
         //储存数据
         $issue->save();
         $project = Project::findOrFail($request->get('project_id'));
-        $issues = $project->issues()->get()->toArray();
+        $issues = $project->issues()->get();
 
         //create history
         $user_name = $user['name'];
@@ -108,6 +111,11 @@ class IssueController extends Controller
     public function show($id)
     {
         //
+        $issue = Issue::find($id);
+        $project = $issue->project()->get();
+        $comments = $issue->comments()->get();
+        $attached_file = $issue->attachments()->get();
+        return view('issue.show', compact('project', 'comments', 'issue', 'attached_file'));
 
     }
 
@@ -121,12 +129,13 @@ class IssueController extends Controller
     {
         //
         $issue = Issue::find($id);
-        $project = $issue->project()->get()->first();
+        $project = $issue->project();
+        $issue_project = $project->get()->first();
+        $project_id = $issue_project['id'];
         $comments = $issue->comments()->get();
-        $users = $project->users()->get()->toArray(); //using for show assignee
-        $project_members = $project->users()->get()->toArray();
+        $project_members = $issue_project->users()->get()->toArray();
 
-        return view('issue.edit', ['issue' => Issue::findOrFail($id)], compact('issue', 'id', 'project','project_members', 'users', 'comments'));
+        return view('issue.edit', ['issue' => Issue::findOrFail($id)], compact('issue', 'id', 'project', 'project_id','project_members', 'comments'));
     }
 
     /**
@@ -138,7 +147,10 @@ class IssueController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
+        $user = Auth::user();
+
+        //validate input data
         $this->validate($request, [
             'type'    =>  'required',
             'subject'    =>  'required',
@@ -165,10 +177,10 @@ class IssueController extends Controller
 
         $issue->save();
 
+        //email notification
         Mail::to($request->user())->send(new UpdateHistory());
 
         //create history
-        $user = Auth::user();
         $user_name = $user['name'];
         $project = $issue->project()->get()->first();
         $project_name = $project['project_name'];
@@ -185,7 +197,31 @@ class IssueController extends Controller
 
         $history->save();
 
-        return redirect('/home')->with('success', 'Data Updated');
+        return redirect()->route('issue_show', ['issue_id'=>$issue['id']])->with('success', 'Data Updated');
+    }
+
+    public function attachFile(Request $request, $id)
+    {
+        $this->validate($request, [
+            'attchFile'    =>  'required|file|max:5000'
+        ]);
+
+        $user = Auth::user();
+        $issue = Issue::find($id);
+
+        $uploadedFile = $request->file('attchFile');
+        $fileName = $uploadedFile->getClientOriginalName();
+        $uploadedFile->move('uploaded_file', $fileName);
+
+        $attachment = new Attachment([
+            'uploaded_user_id'    =>  $user['id'],
+            'attached_issue_id'    =>  $issue['id'],
+            'attached_file'    =>  $fileName
+        ]);
+
+        $attachment->save();
+
+        return redirect()->route('issue_show', ['issue_id'=>$issue['id']]);
     }
 
     /**

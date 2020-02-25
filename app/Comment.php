@@ -21,6 +21,6 @@ class Comment extends Model
 
     public function history()
     {
-        return $this->hasOne(\App\History::class);
+        return $this->hasOne(\App\History::class, 'comment_id');
     }
 }

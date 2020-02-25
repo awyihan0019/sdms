@@ -34,7 +34,7 @@ class CommentController extends Controller
     {
         //
         $issue = Issue::find($issue_id);
-        $project = $issue->project()->get()->first();
+        $project = $issue->project()->get();
         return view('comment.create', compact('issue', 'project'));
     }
 
@@ -63,17 +63,21 @@ class CommentController extends Controller
 
          //create history
          $user_name = $user['name'];
-         $issue = $comment->issue()->get()->first();
-         $project = $issue->project()->get()->first();
-         $project_name = $project['project_name'];
-         $issue_id = $issue['id'];
+         $issue = $comment->issue();
+         $current_issue = $issue->get()->first();
+         $issue_toArray = $current_issue->toArray();
+         $project = $current_issue->project();
+         $current_project = $project->get()->first();
+         $project_toArray = $current_project->toArray();
+         $project_name = $current_project['project_name'];
+         $issue_id = $issue_toArray['id'];
 
          $action_log = "$user_name had been comment to issue $issue_id in $project_name";
 
          $history = new History([
              'user_id'   =>  $user['id'],
-             'project_id'    => $project['id'],
-             'issue_id'    => $issue['id'],
+             'project_id'    => $project_toArray['id'],
+             'issue_id'    => $issue_toArray['id'],
              'comment_id'    => $comment['id'],
              'action_log'    =>  $action_log
          ]);
@@ -81,7 +85,7 @@ class CommentController extends Controller
          $history->save();
 
         //返回页面
-        return redirect('/home')->with('success', 'Data Added');
+        return redirect()->route('issue_show', ['issue_id'=>$issue_toArray['id']])->with('success', 'Data Updated');
     }
 
     /**

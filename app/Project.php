@@ -11,16 +11,16 @@ class Project extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class)->withTimeStamps();
+        return $this->belongsToMany(\App\User::class)->withTimeStamps();
     }
 
     public function issues()
     {
-        return $this->hasMany(\App\Issue::class);
+        return $this->hasMany(\App\Issue::class, 'project_id');
     }
 
     public function histories()
     {
-        return $this->hasMany(\App\History::class);
+        return $this->hasMany(\App\History::class, 'project_id');
     }
 }

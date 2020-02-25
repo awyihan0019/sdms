@@ -6,7 +6,7 @@
 <div class="row" style="margin-left:200px; width:70%">
     <div class="col-md-12">
         <br />
-        <h3>Create New Issue <input form="create-issue" type="submit" class="btn btn-primary pull-right" value="Create New Issue"/></h3>
+        <h3>Create New Issue </h3>
         <br />
 
         @if(count($errors) > 0)
@@ -36,10 +36,10 @@
             <div class="form-group" style="max-width:200px">
                 <select type="text" name="type" class="form-control">
                     <option value="" disabled selected>Issue Type</option>
-                    <option value="task">Task</option>
-                    <option value="bug">Bug</option>
-                    <option value="request">Request</option>
-                    <option value="other">Other</option>
+                    <option value="Task">Task</option>
+                    <option value="Bug">Bug</option>
+                    <option value="Request">Request</option>
+                    <option value="Other">Other</option>
                 </select>
             </div>
             <div class="form-group" style="width:100%">
@@ -74,9 +74,9 @@
                     <label for="description">Category</label>
                     <select type="text" name="category" class="form-control">
                         <option value="" disabled selected></option>
-                        <option value="normal">User Interface</option>
-                        <option value="low">Functionality</option>
-                        <option value="high">Database</option>
+                        <option value="User Interface">User Interface</option>
+                        <option value="Functionality">Functionality</option>
+                        <option value="Database">Database</option>
                     </select>
                 </div>
                 <div class="col-sm-6">
@@ -84,10 +84,7 @@
                     <input type="text" name="version" class="form-control" />
                 </div>
             </div>
-            <div class="form-group">
-                <label for="exampleFormControlFile1">External File</label>
-                <input type="file" class="form-control-file" id="exampleFormControlFile1">
-            </div>
+            <input form="create-issue" type="submit" class="btn btn-primary pull-right" value="Create New Issue"/>
         </form>
 
 

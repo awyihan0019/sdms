@@ -23,25 +23,25 @@
                 <div class="form-group" style="max-width:200px">
                     <select type="text" name="type" class="form-control">
                         <option value="" disabled>Issue Type</option>
-                        @if ($issue['type'] == 'task')
-                        <option value="task" selected>Task</option>
+                        @if ($issue['type'] == 'Task')
+                        <option value="Task" selected>Task</option>
                         @else
-                        <option value="task">Task</option>
+                        <option value="Task">Task</option>
                         @endif
-                        @if ($issue['type'] == 'bug')
-                        <option value="bug" selected>Bug</option>
+                        @if ($issue['type'] == 'Bug')
+                        <option value="Bug" selected>Bug</option>
                         @else
-                        <option value="bug">Bug</option>
+                        <option value="Bug">Bug</option>
                         @endif
-                        @if ($issue['type'] == 'request')
-                        <option value="request" selected>Request</option>
+                        @if ($issue['type'] == 'Request')
+                        <option value="Request" selected>Request</option>
                         @else
-                        <option value="request">Request</option>
+                        <option value="Request">Request</option>
                         @endif
-                        @if ($issue['type'] == 'other')
-                        <option value="other" selected>Other</option>
+                        @if ($issue['type'] == 'Other')
+                        <option value="Other" selected>Other</option>
                         @else
-                        <option value="other">Other</option>
+                        <option value="Other">Other</option>
                         @endif
                     </select>
                 </div>
@@ -102,20 +102,20 @@
                         <label for="description">Category</label>
                         <select type="text" name="category" class="form-control">
                             <option value="" disabled></option>
-                            @if ($issue['category'] == 'UI')
-                            <option value="UI" selected>Open</option>
+                            @if ($issue['category'] == 'User Interface')
+                            <option value="User Interface" selected>User Interface</option>
                             @else
-                            <option value="UI">Open</option>
+                            <option value="User Interface">User Interface</option>
                             @endif
-                            @if ($issue['category'] == 'Func')
-                            <option value="Func" selected>In Progress</option>
+                            @if ($issue['category'] == 'Functionality')
+                            <option value="Functionality" selected>Functionality</option>
                             @else
-                            <option value="Func">In Progress</option>
+                            <option value="Functionality">Functionality</option>
                             @endif
-                            @if ($issue['category'] == 'DB')
-                            <option value="DB" selected>Database</option>
+                            @if ($issue['category'] == 'Database')
+                            <option value="Database" selected>Database</option>
                             @else
-                            <option value="DB">Database</option>
+                            <option value="Database">Database</option>
                             @endif
                         </select>
                     </div>
@@ -148,67 +148,36 @@
                         <label for="description">Status</label>
                         <select type="text" name="status" class="form-control">
                             <option value="" disabled></option>
-                            @if ($issue['status'] == 'open')
-                            <option value="open" selected>Open</option>
+                            @if ($issue['status'] == 'Open')
+                            <option value="Open" selected>Open</option>
                             @else
-                            <option value="open">Open</option>
+                            <option value="Open">Open</option>
                             @endif
-                            @if ($issue['status'] == 'in_progress')
-                            <option value="in_progress" selected>In Progress</option>
+                            @if ($issue['status'] == 'In Progress')
+                            <option value="In Progress" selected>In Progress</option>
                             @else
-                            <option value="in_progress">In Progress</option>
+                            <option value="In Progress">In Progress</option>
                             @endif
-                            @if ($issue['status'] == 'resolved')
-                            <option value="resolved" selected>Resolved</option>
+                            @if ($issue['status'] == 'Resolved')
+                            <option value="Resolved" selected>Resolved</option>
                             @else
-                            <option value="resolved">Resolved</option>
+                            <option value="Resolved">Resolved</option>
                             @endif
-                            @if ($issue['status'] == 'closed')
-                            <option value="closed" selected>Closed</option>
+                            @if ($issue['status'] == 'Closed')
+                            <option value="Closed" selected>Closed</option>
                             @else
-                            <option value="closed">Closed</option>
+                            <option value="Closed">Closed</option>
                             @endif
                         </select>
                     </div>
-                    <div class="col-sm-6">
-                        <label for="exampleFormControlFile1">External File</label>
-                        <input type="file" class="form-control-file" id="exampleFormControlFile1">
-                    </div>
                 </div>
                 <div class="form-group">
-                    <input type="hidden" name="project_id" value="{{ $project['id'] }}">
+                    <input type="hidden" name="project_id" value="{{ $project_id }}">
                 </div>
                 <div class="form-group">
                     <input type="submit" class="btn btn-primary" aglin="right" value="Update Issue" />
                 </div>
             </form>
         </div>
-    </div>
-    <hr>
-    <div style="margin-left:200px; width:70%">
-        <h2 class="reviews">Comment <a href="{{route('add_comment', ['issue_id'=>$issue['id']])}}"
-                class="btn btn-secondary float-right">Add Comment</a></h2>
-        <br>
-        @if (empty($comments))
-        <div class="card">
-            <div class="card-body">
-                <div>
-                    <p class="card-text">No any comment found.</p>
-                </div>
-            </div>
-        </div>
-        @else
-        @foreach($comments ?? '' as $row)
-        <div class="card">
-            <div class="card-body">
-                <div>
-                    <h5 class="card-title">{{ $row->commented_user()->first()['name'] }}</h5>
-                    <p class="card-text">{{$row['content']}}</p>
-                </div>
-            </div>
-            <div class="card-footer text-muted">{{$row['created_at']}}</div>
-        </div>
-        @endforeach
-        @endif
     </div>
     @endsection

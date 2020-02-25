@@ -10,13 +10,13 @@
                         Project</a></div>
             <div id="show_projects" class="collapse in show">
                 <ul class="list-group list-group-flush">
-                    @if (empty($projects))
-                    <li class="list-group-item">No any project found</li>
-                    @else
+                    @if ($projects->first()  != null)
                     @foreach($projects ?? '' as $row)
                     <li class="list-group-item"><a
                             href="{{action('ProjectController@show', $row['id'])}}">{{$row['project_name']}}</a></li>
                     @endforeach
+                    @else
+                    <li class="list-group-item">No any project found</li>
                     @endif
                 </ul>
             </div>
@@ -39,20 +39,16 @@
                             <th style="width:100px">Due Date</th>
                         </thead>
                     </tr>
-                    @if (empty($issues))
-                    <tr>
-                        <td>No issue found</td>
-                    </tr>
-                    @else
+                    @if ($issues->first()  != null)
                     @foreach ($issues as $row)
                     <tr>
                         <td>{{$row['id']}}</td>
                         <td>{{$row['type']}}</td>
-                        <td><a href="{{route('issue_edit', ['issue_id'=>$row['id']])}}">{{$row['subject']}}</a></td>
+                        <td><a href="{{route('issue_show', ['issue_id'=>$row['id']])}}">{{$row['subject']}}</a></td>
                         @if (empty($row['assigned_user_id']))
                         <td>Not set</td>
                         @else
-                        <td>{{ $row['assigned_user_id'] }}</td>
+                        <td>{{ $row->assignedUser()->first()['name'] }}</td>
                         @endif
                         <td>{{$row['status']}}</td>
                         @if ($row['priority'] == "high")
@@ -69,6 +65,10 @@
                         @endif
                     </tr>
                     @endforeach
+                    @else
+                    <tr>
+                        <td colspan="7">No issue found</td>
+                    </tr>
                     @endif
                 </table>
             </div>
@@ -80,9 +80,7 @@
                     aria-controls="collapseOne">Dashboard<i class="fas fa-chevron-down fa-fw"></i></div>
         </div>
         <div id="show_histories" class="collapse in show">
-            @if (empty($histories))
-            <p>No history found</p>
-            @else
+            @if ($histories->first()  != null)
             @foreach ($histories as $row)
             <div class="card bg-light mb-3">
                 <div class="card-header">{{ $row['created_at'] }}</div>
@@ -91,6 +89,8 @@
                 </div>
             </div>
             @endforeach
+            @else
+            <p>No history found</p>
             @endif
         </div>
     </div>

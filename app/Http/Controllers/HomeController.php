@@ -32,15 +32,13 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        $projects = DB::table('projects')->get()->toArray();
-        $projects = $user->projects()->get()->toArray();
+        $projects = $user->projects()->get();
 
-        $allIssues = DB::table('issues')->get()->toArray();
-        $assignedIssues = $user->AssignedIssue()->get()->toArray();
-        $postedIssues = $user->postedIssue()->get()->toArray();
-        $issues = array_merge($assignedIssues, $postedIssues); //here have some problem fix
+        $assignedIssues = $user->AssignedIssue()->get();
+        $postedIssues = $user->postedIssue()->get();
+        $issues = $assignedIssues->merge($postedIssues); //here have some problem fix
 
-        $histories = $user->histories()->get()->sortByDesc('created_at')->toArray();
+        $histories = $user->histories()->get()->sortByDesc('created_at');
         return view('/home', [
             'projects' => $projects,
             'issues' => $issues,
