@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
+use App\History;
 use App\Project;
 use App\User;
-use App\History;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Role;
 
 class ProjectController extends Controller
 {
@@ -19,22 +18,28 @@ class ProjectController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     public $user;
+    public $user;
 
-     public function __construct()
-     {
-         $this->middleware('auth');
-         $this->middleware(function ($request, $next) {
-             $this->user = Auth::user();
-             $project_id = Route::current()->parameters['project_id'];
-             $user_role = $this->user->projects()->get()->where('id', $project_id)->first()->pivot->role;
-             $this->user->syncRoles($user_role);
-             return $next($request);
-         });
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            $this->user = Auth::user();
 
-         $this->middleware('permission:invite_member', ['only' => ['storeMember']]);
+            if (empty(Route::current()->parameters['project_id'])){
+                // dd(Route::current()->uri);
+            } else {
+                $project_id = Route::current()->parameters['project_id'];
+
+                $user_role = $this->user->projects()->get()->where('id', $project_id)->first()->pivot->role;
+                $this->user->syncRoles($user_role);
+            }
+
+            return $next($request);
+        });
+
+        $this->middleware('permission:invite_member', ['only' => ['storeMember']]);
     }
-
 
     public function index()
     {
@@ -66,11 +71,11 @@ class ProjectController extends Controller
         //
         //确认输入所需数据 validate the data input
         $this->validate($request, [
-            'project_name'    =>  'required',
+            'project_name' => 'required',
         ]);
         //创造新variable 并copy 输入的数据
         $project = new Project([
-            'project_name'    =>  $request->get('project_name'),
+            'project_name' => $request->get('project_name'),
         ]);
         //储存数据
         $user = Auth::user();
@@ -80,16 +85,15 @@ class ProjectController extends Controller
         // $user->projects()->attach($project);
         // $user->projects()->updateExistingPivot($project, ['role_id' => 1]);
 
-
         //create histories
         $user_name = $user['name'];
         $project_name = $project['project_name'];
         $action_log = "$user_name <span class=\"badge badge-success\">Create</span> a project $project_name";
 
         $history = new History([
-            'user_id'   =>  $user['id'],
-            'project_id'    => $project['id'],
-            'action_log'    =>  $action_log
+            'user_id' => $user['id'],
+            'project_id' => $project['id'],
+            'action_log' => $action_log,
         ]);
 
         $history->save();
@@ -118,11 +122,10 @@ class ProjectController extends Controller
         //get all histories for project
         $histories = $project->histories()->get()->sortByDesc('created_at');
 
-
         // return view('project.show', compact('project', 'project_id', 'users', 'histories'));
         //
         //,['project_id' => $project_id]
-        return view('project.show', compact('project_id','project_name', 'users', 'histories'));
+        return view('project.show', compact('project_id', 'project_name', 'users', 'histories'));
     }
 
     /**
@@ -150,7 +153,7 @@ class ProjectController extends Controller
     {
         //
         $this->validate($request, [
-            'project_name'    =>  'required'
+            'project_name' => 'required',
         ]);
         $project = Project::find($project_id);
         $project->project_name = $request->get('project_name');
@@ -179,16 +182,16 @@ class ProjectController extends Controller
         $project_id = $request->input('project_id');
 
         // //储存数据
-        $user = User::where('email',$email) -> first();
-        if(empty($user)){
+        $user = User::where('email', $email)->first();
+        if (empty($user)) {
             return redirect()->back()->with('error', 'The email not found in used');
-        }else{
+        } else {
             $project = Project::findOrFail($project_id);
 
             $project_members = $project->users()->get()->toArray();
 
-            foreach($project_members as $member){
-                if($member['email'] == $email){
+            foreach ($project_members as $member) {
+                if ($member['email'] == $email) {
                     return redirect()->back()->with('error', 'The member is already added');
                 }
             }
@@ -202,14 +205,14 @@ class ProjectController extends Controller
             $action_log = "$project_name has been <span class=\"badge badge-success\">Invite</span> a new member $user_name";
 
             $history = new History([
-                'user_id'   =>  $user['id'],
-                'project_id'    => $project['id'],
-                'action_log'    =>  $action_log
+                'user_id' => $user['id'],
+                'project_id' => $project['id'],
+                'action_log' => $action_log,
             ]);
 
             $history->save();
         }
         //返回页面
-        return redirect()->action('ProjectController@show', $project_id);;
+        return redirect()->action('ProjectController@show', $project_id);
     }
 }

@@ -15,20 +15,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::group(['middleware' => ['auth']], function() {
-    // Route::resource('project/{project_id}', 'ProjectController');
-    // Route::resource('issue', 'IssueController');
     Route::resource('comment', 'CommentController');
 });
 
-Route::patch('project/{project_id}/issue/store/{issue_id}', 'IssueController@update');
-
 //Project Controller
+
+Route::get('project', 'ProjectController@create');
+
+Route::post('project', 'ProjectController@store');
 
 Route::get('project/{project_id}', [
     'as' => 'currentProject', 'uses' => 'ProjectController@show'
 ]);
-
-// Route::get('project/{project_id}', 'ProjectController@showIssue');
 
 Route::post('/project/{project_id}/invite user', [
     'as' => 'storeMember', 'uses' => 'ProjectController@storeMember'
@@ -40,16 +38,20 @@ Route::get('project/{project_id}/issue/index', [
     'as' => 'issue_index', 'uses' => 'IssueController@index'
 ]);
 
+Route::get('/issue/create/{project_id}', [
+    'as' => 'issue_create', 'uses' => 'IssueController@create'
+]);
+
+Route::post('issue/{project_id}', 'IssueController@store');
+
 Route::get('project/{project_id}/issue/edit/{issue_id}', [
     'as' => 'issue_edit', 'uses' => 'IssueController@edit'
 ]);
 
+Route::patch('project/{project_id}/issue/store/{issue_id}', 'IssueController@update');
+
 Route::get('project/{project_id}//issue/show/{issue_id}', [
     'as' => 'issue_show', 'uses' => 'IssueController@show'
-]);
-
-Route::get('/issue/create/{project_id}', [
-    'as' => 'issue_create', 'uses' => 'IssueController@create'
 ]);
 
 //file upload and download

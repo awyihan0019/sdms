@@ -26,7 +26,7 @@
 
         <!-- form start below -->
 
-        <form id="create-issue" method="post" action="{{url('issue')}}">
+        <form id="create-issue" method="post" action="{{action('IssueController@store', [$project_id])}}">
             {{csrf_field()}}
 
             <div class="form-group">

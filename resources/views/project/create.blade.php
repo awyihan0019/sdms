@@ -23,7 +23,7 @@
             </div>
             @endif
 
-            <form method="post" action="{{url('project')}}">
+            <form method="post" action="{{action('ProjectController@store')}}">
                 {{csrf_field()}}
                 <div class="form-group">
                     <input type="text" name="project_name" class="form-control" placeholder="Enter Project Name" />
