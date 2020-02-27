@@ -14,52 +14,53 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::group(['middleware' => ['auth']], function() {
+    // Route::resource('project/{project_id}', 'ProjectController');
+    // Route::resource('issue', 'IssueController');
+    Route::resource('comment', 'CommentController');
+});
 
-Route::resource('project', 'ProjectController');
-
-Route::resource('issue', 'IssueController');
-
-Route::resource('comment', 'CommentController');
+Route::patch('project/{project_id}/issue/store/{issue_id}', 'IssueController@update');
 
 //Project Controller
 
-Route::get('/project/add_member/{project_id}', [
-    'as' => 'add_member', 'uses' => 'ProjectController@addMember'
-]);
-
-Route::post('/project/store_member/{project_id}', [
-    'as' => 'store_member', 'uses' => 'ProjectController@storeMember'
-]);
-
-Route::get('project/{id}', [
+Route::get('project/{project_id}', [
     'as' => 'currentProject', 'uses' => 'ProjectController@show'
 ]);
 
-Route::get('project/{id}', 'ProjectController@showIssue');
+// Route::get('project/{project_id}', 'ProjectController@showIssue');
+
+Route::post('/project/{project_id}/invite user', [
+    'as' => 'storeMember', 'uses' => 'ProjectController@storeMember'
+]);
 
 //Issue Controller
 
-Route::get('/issue/index/{project_id}', [
+Route::get('project/{project_id}/issue/index', [
     'as' => 'issue_index', 'uses' => 'IssueController@index'
 ]);
 
-Route::get('/issue/edit/{issue_id}', [
+Route::get('project/{project_id}/issue/edit/{issue_id}', [
     'as' => 'issue_edit', 'uses' => 'IssueController@edit'
 ]);
 
-Route::get('/issue/show/{issue_id}', [
+Route::get('project/{project_id}//issue/show/{issue_id}', [
     'as' => 'issue_show', 'uses' => 'IssueController@show'
 ]);
 
-Route::get('/project/create_issue/{project_id}', [
-    'as' => 'create_issue', 'uses' => 'IssueController@create'
+Route::get('/issue/create/{project_id}', [
+    'as' => 'issue_create', 'uses' => 'IssueController@create'
 ]);
 
-Route::post('/attachFile/{id}', 'IssueController@attachFile');
+//file upload and download
 
+Route::post('project/{project_id}/issue/{issue_id}/attachFile', 'IssueController@attachFile');
 
+Route::get('/attachFile/download/{id}', 'IssueController@download')->name('attachment.download');
 
-Route::get('/issue/comment/{issue_id}', [
+//Comment
+
+Route::get('project/{project_id}/issue/{issue_id}/comment', [
     'as' => 'add_comment', 'uses' => 'CommentController@create'
 ]);
 

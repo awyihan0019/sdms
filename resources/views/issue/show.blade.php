@@ -6,8 +6,13 @@
 <div class="row" style="margin-left:200px; width:70%">
     <div class="col-md-12">
         <br />
-        <h3>Issue #{{ $issue['id']}}<a href="{{route('issue_edit', ['issue_id'=>$issue['id']])}}"
-                class="btn btn-secondary float-right"><i class="fas fa-edit">Edit Issue</i></a></h3>
+        <h3>Issue #{{ $issue['id']}}
+            @can('edit_issues')
+            <a href="{{route('issue_edit', ['project_id'=>$project_id, 'issue_id'=>$issue['id']])}}" class="btn btn-secondary float-right">
+                <i class="fas fa-edit">Edit Issue</i>
+            </a>
+            @endcan
+        </h3>
         <br />
         <table class="table">
             <tr>
@@ -51,7 +56,7 @@
                 @elseif($issue['category'] == 'Database')
                 <td>Database</td>
                 @endif
-                <th><strong> Project Version  </strong></th>
+                <th><strong> Project Version </strong></th>
                 <td> {{ $issue['version'] }} </td>
             </tr>
             <tr>
@@ -61,7 +66,7 @@
                 @else
                 <td> {{ $issue['due_date'] }} </td>
                 @endif
-                <th><strong> Assignee  </strong></th>
+                <th><strong> Assignee </strong></th>
                 @if (empty($issue['assigned_user_id']))
                 <td> Not set </td>
                 @else
@@ -76,9 +81,11 @@
                     Attached File
                     <i class="fas fa-chevron-down fa-fw"></i>
                 </a>
+                @can('attach_file')
                 <button class="btn btn-secondary float-right" data-toggle="modal" data-target="#attach_new_file">
                     <i class="fas fa-paperclip">Attach New File</i>
                 </button>
+                @endcan
             </div>
         </div>
         <!-- Modal -->
@@ -94,7 +101,7 @@
                     </div>
                     <div class="modal-body">
                         <form id="attach_file" method="post"
-                            action="{{action('IssueController@attachFile', $issue['id'])}}"
+                            action="{{action('IssueController@attachFile',[$project_id ,$issue['id']])}}"
                             enctype="multipart/form-data">
                             {{csrf_field()}}
                             <div class="form-group">
@@ -122,7 +129,7 @@
                 @if ($check = $attached_file->first() != null)
                 @foreach ($attached_file as $row)
                 <tr>
-                    <td>{{$row['attached_file']}}</td>
+                    <td><a href="{{ route('attachment.download', $row->id) }}">{{$row['file_name']}}</a></td>
                     <td>{{$row->uploaded_user()->first()['name']}}</td>
                     <td>{{$row['created_at']}}</td>
                 </tr>
@@ -176,7 +183,7 @@
     {{--  --}}
     {{--  --}}
     <br>
-    @if ($comments->first()  != null)
+    @if ($comments->first() != null)
     @foreach($comments ?? '' as $row)
     <div class="card">
         <div class="card-body">

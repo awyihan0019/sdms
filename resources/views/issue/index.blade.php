@@ -28,7 +28,7 @@
         @foreach ($issues as $row)
         <tr>
             <td>{{$row['type']}}</td>
-            <td><a href="{!! route('issue_show',['issue_id'=>$row['id']]) !!}">{{$row['subject']}}</a></td>
+            <td><a href="{!! route('issue_show',['project_id'=>$project_id, 'issue_id'=>$row['id']]) !!}">{{$row['subject']}}</a></td>
             @if (empty($row['assigned_user_id']))
             <td>Not set</td>
             @else
@@ -56,16 +56,4 @@
         @endif
     </table>
 </div>
-{{--
-<script>
-    document.addEventListener("DOMContentLoaded",() => {
-        const rows = document.querySelectorAll("tr[data-herf]");
-
-        rows.forEach(row => {
-            row.addEventListener("click", () => {
-                window.location.herf = row.dataset.href;
-            })
-        })
-    })
-</script> --}}
 @endsection

@@ -17,7 +17,7 @@
                 @endforeach
             </ul>
             @endif
-            <form method="post" action="{{action('IssueController@update', $issue['id'])}}">
+            <form method="post" action="{{action('IssueController@update', [$project_id , $issue['id']])}}">
                 {{csrf_field()}}
                 <input type="hidden" name="_method" value="PATCH" />
                 <div class="form-group" style="max-width:200px">

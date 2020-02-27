@@ -44,7 +44,7 @@
                     <tr>
                         <td>{{$row['id']}}</td>
                         <td>{{$row['type']}}</td>
-                        <td><a href="{{route('issue_show', ['issue_id'=>$row['id']])}}">{{$row['subject']}}</a></td>
+                        <td><a href="{{route('issue_show', ['project_id'=>$row->project()->first()['id'], 'issue_id'=>$row['id']])}}">{{$row['subject']}}</a></td>
                         @if (empty($row['assigned_user_id']))
                         <td>Not set</td>
                         @else
@@ -85,7 +85,7 @@
             <div class="card bg-light mb-3">
                 <div class="card-header">{{ $row['created_at'] }}</div>
                 <div class="card-body">
-                    <p class="card-text">{{ $row['action_log'] }}</p>
+                    <p class="card-text">{!! $row['action_log'] !!}</p>
                 </div>
             </div>
             @endforeach

@@ -30,7 +30,7 @@
             {{csrf_field()}}
 
             <div class="form-group">
-                <input type="hidden" name="project_id" value="{{ $project['id'] }}">
+                <input type="hidden" name="project_id" value="{{ $project_id }}">
             </div>
 
             <div class="form-group" style="max-width:200px">

@@ -8,6 +8,8 @@ use App\Project;
 use App\User;
 use App\History;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Route;
 
 class ProjectController extends Controller
 {
@@ -17,9 +19,26 @@ class ProjectController extends Controller
      * @return \Illuminate\Http\Response
      */
 
+     public $user;
+
+     public function __construct()
+     {
+         $this->middleware('auth');
+         $this->middleware(function ($request, $next) {
+             $this->user = Auth::user();
+             $project_id = Route::current()->parameters['project_id'];
+             $user_role = $this->user->projects()->get()->where('id', $project_id)->first()->pivot->role;
+             $this->user->syncRoles($user_role);
+             return $next($request);
+         });
+
+         $this->middleware('permission:invite_member', ['only' => ['storeMember']]);
+    }
+
+
     public function index()
     {
-        // need_fix: need to do for showing all the project and allow to add them to user
+        // problem: need to do for showing all the project and allow to add them to user
         $user = Auth::user();
         $projects = $user->projects()->get()->toArray();
         return view('home', compact('projects'));
@@ -56,12 +75,16 @@ class ProjectController extends Controller
         //储存数据
         $user = Auth::user();
 
-        $project->save();
-        $user->projects()->attach($project);
+        $user->projects()->save($project, ['role' => 'Manager']);
+        // $project->save();
+        // $user->projects()->attach($project);
+        // $user->projects()->updateExistingPivot($project, ['role_id' => 1]);
 
+
+        //create histories
         $user_name = $user['name'];
         $project_name = $project['project_name'];
-        $action_log = "$user_name create a project $project_name";
+        $action_log = "$user_name <span class=\"badge badge-success\">Create</span> a project $project_name";
 
         $history = new History([
             'user_id'   =>  $user['id'],
@@ -81,20 +104,25 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($project_id)
     {
         //
-        $project = Project::find($id);
-        $users = $project->users()->get();
-        $histories = $project->histories()->get()->sortByDesc('created_at');
-        return view('project.show', ['project' => Project::findOrFail($id)], compact('project', 'id', 'users', 'histories'));
-    }
+        //find current project
+        $project = Project::find($project_id);
 
-    public function showIssue($id)
-    {
-        $project = Project::find($id);
-        $issues = $project->issues()->get()->toArray();
-        return view('project.show', compact('issues', 'id'));
+        $project_name = $project->project_name;
+
+        //get project members
+        $users = $project->users()->get();
+
+        //get all histories for project
+        $histories = $project->histories()->get()->sortByDesc('created_at');
+
+
+        // return view('project.show', compact('project', 'project_id', 'users', 'histories'));
+        //
+        //,['project_id' => $project_id]
+        return view('project.show', compact('project_id','project_name', 'users', 'histories'));
     }
 
     /**
@@ -103,10 +131,11 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($project_id)
     {
         //
-        $project = Project::find($id);
+        $project = Project::find($project_id);
+
         return view('project.edit', compact('project', 'id'));
     }
 
@@ -117,13 +146,13 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $project_id)
     {
         //
         $this->validate($request, [
             'project_name'    =>  'required'
         ]);
-        $project = Project::find($id);
+        $project = Project::find($project_id);
         $project->project_name = $request->get('project_name');
         $project->save();
         return redirect('/home')->with('success', 'Data Updated');
@@ -135,25 +164,20 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($project_id)
     {
         //
-        $project = Project::find($id);
+        $project = Project::find($project_id);
         $project->delete();
         return redirect()->route('/home')->with('success', 'Data Deleted');
     }
 
-    public function addMember($project_id)
-    {
-        $project = Project::findOrFail($project_id);
-        return view('project.add_member', compact('project'));
-    }
-
-    public function storeMember(Request $request)
+    public function storeMember(Request $request, $project_id)
     {
         // //创造新variable 并copy 输入的数据
         $email = $request->input('email');
         $project_id = $request->input('project_id');
+
         // //储存数据
         $user = User::where('email',$email) -> first();
         if(empty($user)){
@@ -170,12 +194,12 @@ class ProjectController extends Controller
             }
 
             $user->projects()->attach($project);
-
+            $user->projects()->updateExistingPivot($project, ['role' => $request->input('role')]);
             //add history
             $user_name = $user['name'];
             $project_name = $project['project_name'];
 
-            $action_log = "$project_name has been added a new member $user_name";
+            $action_log = "$project_name has been <span class=\"badge badge-success\">Invite</span> a new member $user_name";
 
             $history = new History([
                 'user_id'   =>  $user['id'],
@@ -186,6 +210,6 @@ class ProjectController extends Controller
             $history->save();
         }
         //返回页面
-        return redirect('/home');
+        return redirect()->action('ProjectController@show', $project_id);;
     }
 }

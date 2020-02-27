@@ -17,7 +17,8 @@ class CreateAttachmentsTable extends Migration
             $table->bigIncrements('id');
             $table->string('uploaded_user_id');
             $table->string('attached_issue_id');
-            $table->string('attached_file');
+            $table->string('path')->nullable();
+            $table->string('file_name');
             $table->timestamps();
         });
     }
