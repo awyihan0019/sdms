@@ -1,21 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'SDMS') }}</title>
-
-    <!-- Scripts -->
+    <title>SDMS</title>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
-    <!-- Styles -->
+    <!-- Custom styles for this template -->
     <link rel="stylesheet" type="text/css" href="{{ url('/css/simple-sidebar.css') }}" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/css/bootstrap.css"
@@ -33,32 +35,63 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
     </script>
+
 </head>
 
 <body>
-    <div id="app page-content-wrapper">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container row">
-                <a class="navbar-brand col-auto mr-auto" href="{{ url('/home') }}">
-                    <i class="fas fa-bug"></i>
-                    {{ config('SDMS', 'SDMS') }}
-                </a>
-                <button class="navbar-toggler col-auto" type="button" data-toggle="collapse"
+
+    <div class="d-flex" id="wrapper">
+
+        <!-- Sidebar -->
+        <div class="bg-light border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">Start Bootstrap </div>
+            <div class="list-group list-group-flush">
+                <a href="{{route('currentProject', ['project_id'=>$project_id])}}"
+                    class="list-group-item list-group-item-action bg-light"><i class="fa fa-home"></i> Project</a>
+                <a href="{{route('issue_index', ['project_id'=>$project_id])}}"
+                    class="list-group-item list-group-item-action bg-light"><i class="fas fa-tasks"></i> Issues</a>
+                <a href="{{route('issue_create', ['project_id'=>$project_id])}}"
+                    class="list-group-item list-group-item-action bg-light"><i class="fas fa-plus"></i> Add Issue</a>
+                <a href="{{route('priority_control', ['project_id'=>$project_id])}}"
+                    class="list-group-item list-group-item-action bg-light"><i class="fas fa-sort-numeric-down"></i>
+                    Priority
+                    Control</a>
+                <a href="{{route('showMembers', ['project_id'=>$project_id])}}"
+                    class="list-group-item list-group-item-action bg-light"><i class="fas fa-users"></i>
+                    Member List</a>
+                <a href="#" class="list-group-item list-group-item-action bg-light"><i class="fab fa-wikipedia-w"></i>
+                    Wiki</a>
+                <a href="#" class="list-group-item list-group-item-action bg-light"><i class="fas fa-cog"></i>
+                    Setting</a>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom affix-top">
+                <button class="btn btn-primary" id="menu-toggle"><i class="fas fa-bars"></i> Toggle Menu</button>
+
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
                     data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                    aria-label="{{ __('Toggle navigation') }}">
+                    aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+                <h3 style="margin-left:40px;margin-bottom:1px;margin-top:1px;"><i class="far fa-building"></i>
+                    {{ $project_name }}</h3>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav mr-auto">
-                        <li><a class="navbar-brand" href="{{ url('/home') }}" style="color:gray;">Home</a></li>
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ml-auto">
-                        <!-- Authentication Links -->
-                        @guest
+                <div class="collapse navbar-collapse in" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{{ url('/home') }}">Home <span
+                                    class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"> {{ Auth::user()->roles->pluck('name')->first() }}</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                         </li>
@@ -89,26 +122,25 @@
                         @endguest
                     </ul>
                 </div>
+            </nav>
+
+            <div class="container-fluid">
+                @yield('project-content')
             </div>
-        </nav>
+        </div>
+        <!-- /#page-content-wrapper -->
 
-        <main class="py-4" style="padding:0px">
-            @yield('content')
-        </main>
     </div>
-    <script>
-        /* Set the width of the side navigation to 250px and the left margin of the page content to 250px */
-    function openNav() {
-      document.getElementById("mySidenav").style.width = "250px";
-      document.getElementById("main").style.marginLeft = "250px";
-    }
+    <!-- /#wrapper -->
 
-    /* Set the width of the side navigation to 0 and the left margin of the page content to 0 */
-    function closeNav() {
-      document.getElementById("mySidenav").style.width = "0";
-      document.getElementById("main").style.marginLeft = "0";
-    }
+    <!-- Menu Toggle Script -->
+    <script>
+        $("#menu-toggle").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+    });
     </script>
+
 </body>
 
 </html>

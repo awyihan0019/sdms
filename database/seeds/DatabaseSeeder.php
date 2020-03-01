@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(UsersTableSeeder::class);
+        $this->call(IssuesTableSeeder::class);
 
         //create roles
         $roleManager = Role::create(['name' => 'Manager']);

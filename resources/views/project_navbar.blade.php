@@ -9,4 +9,5 @@
     @can('create_issues')
     <a href="{{route('issue_create', ['project_id'=>$project_id])}}" class="w3-bar-item w3-button current"><i class="fas fa-plus"></i> Add Issue</a>
     @endcan
+    <a href="{{route('priority_control', ['project_id'=>$project_id])}}" class="w3-bar-item w3-button current"><i class="fas fa-plus"></i> Priority Control</a>
 </div>

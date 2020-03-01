@@ -1,7 +1,7 @@
 @component('mail::message')
-# Order Shipped
+{{-- # {{ $type }} --}}# test email
 
-Your order has been shipped!
+{{-- {{ $content }} --}}    Testing purpose.
 
 
 Thanks,<br>

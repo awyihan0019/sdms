@@ -1,14 +1,13 @@
-@extends('layouts.app')
+@extends('layouts.project-layout')
 
-@include('project_navbar')
-
-@section('content')
-<div class="row" style="margin-left:200px; width:70%">
+@section('project-content')
+<div class="row">
     <div class="col-md-12">
         <br />
         <h3>Issue #{{ $issue['id']}}
             @can('edit_issues')
-            <a href="{{route('issue_edit', ['project_id'=>$project_id, 'issue_id'=>$issue['id']])}}" class="btn btn-secondary float-right">
+            <a href="{{route('issue_edit', ['project_id'=>$project_id, 'issue_id'=>$issue['id']])}}"
+                class="btn btn-secondary float-right" style="margin-righr:20px">
                 <i class="fas fa-edit">Edit Issue</i>
             </a>
             @endcan
@@ -74,6 +73,12 @@
                 @endif
             </tr>
         </table>
+        @error('attchFile')
+        <div class="alert alert-danger alert-dismissible">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Upload Failed !</strong> {{ $message }}
+        </div>
+        @enderror
         <div class="card">
             <div class="card-header">
                 <a data-toggle="collapse" data-target="#show_attached_file" aria-expanded="false"
@@ -142,12 +147,18 @@
     </div>
 </div>
 <hr>
-<div class="col-md-12" style="margin-left:200px; width:70%">
+<div class="col-md-12">
     <h3 class="reviews">Comment
         <button class="btn btn-secondary float-right" data-toggle="modal" data-target="#comment_issue"><i
                 class="fas fa-comment-dots">Add Comment</i></button>
     </h3>
     {{--  --}}
+    @error('comment')
+    <div class="alert alert-danger alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <strong>Comment Failed !</strong> {{ $message }}
+    </div>
+    @enderror
     {{--  --}}
 
     <!-- Modal -->
@@ -167,6 +178,18 @@
                         <div class="form-group">
                             <textarea type="text" cols="40" rows="5" name="content" class="form-control"
                                 placeholder="Leave a comment"></textarea>
+                        </div>
+                        <div class="form-group">
+                            @if (empty($issue['assigned_user_id']) != true)
+                            <input type="checkbox" id="mail_to_assignee" name="mail_to_assignee" value="true">
+                            <label for="mail_to_assignee"> Send an email to the Assignee :
+                                <strong>{{ $issue->assignedUser()->first()['name'] }}</strong></label><br>
+                            @endif
+                            @if (empty($issue['post_user_id']) != true)
+                            <input type="checkbox" id="mail_to_publisher" name="mail_to_publisher" value="true">
+                            <label for="mail_to_publisher"> Send an email to the Publisher :
+                                <strong>{{ $issue->postedUser()->first()['name'] }}</strong></label><br>
+                            @endif
                         </div>
                         <div class="form-group">
                             <input type="hidden" name="issue_id" value="{{ $issue['id']}}">

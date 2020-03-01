@@ -175,6 +175,18 @@ class ProjectController extends Controller
         return redirect()->route('/home')->with('success', 'Data Deleted');
     }
 
+    public function showMember($project_id)
+    {
+        //find current project
+        $project = Project::find($project_id);
+        //get project members
+        $members = $project->users()->get();
+
+        $project_name = $project['project_name'];
+
+        return view('member.index', compact('project_id', 'project_name', 'members'));
+    }
+
     public function storeMember(Request $request, $project_id)
     {
         // //创造新variable 并copy 输入的数据

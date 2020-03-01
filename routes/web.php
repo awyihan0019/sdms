@@ -28,7 +28,11 @@ Route::get('project/{project_id}', [
     'as' => 'currentProject', 'uses' => 'ProjectController@show'
 ]);
 
-Route::post('/project/{project_id}/invite user', [
+Route::get('/project/{project_id}/show_members', [
+    'as' => 'showMembers', 'uses' => 'ProjectController@showMember'
+]);
+
+Route::post('/project/{project_id}/invite_user', [
     'as' => 'storeMember', 'uses' => 'ProjectController@storeMember'
 ]);
 
@@ -50,8 +54,14 @@ Route::get('project/{project_id}/issue/edit/{issue_id}', [
 
 Route::patch('project/{project_id}/issue/store/{issue_id}', 'IssueController@update');
 
+Route::patch('project/{project_id}/issue/update_priority/{issue_id}', 'IssueController@updatePriority');
+
 Route::get('project/{project_id}//issue/show/{issue_id}', [
     'as' => 'issue_show', 'uses' => 'IssueController@show'
+]);
+
+Route::get('project/{project_id}/issue/priority_control', [
+    'as' => 'priority_control', 'uses' => 'IssueController@priorityControl'
 ]);
 
 //file upload and download

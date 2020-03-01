@@ -4,13 +4,16 @@
 <div class="row justify-content-center" style="width:90%;margin-left:20px">
     <div class="col-md-12 col-sm-12 col-xl-6">
         <div class="card ">
-            <div class="card-header"><a data-toggle="collapse" data-target="#show_projects" aria-expanded="false"
-                    aria-controls="collapseOne">Projects<i class="fas fa-chevron-down fa-fw"></i><a
-                        href="{{action('ProjectController@create')}}" class="btn btn-secondary pull-right">Add
-                        Project</a></div>
+            <div class="card-header">
+                <a data-toggle="collapse" data-target="#show_projects" aria-expanded="false"
+                    aria-controls="collapseOne">Projects
+                    <i class="fas fa-chevron-down fa-fw"></i>
+                    <a href="{{action('ProjectController@create')}}" class="btn btn-secondary pull-right">Add
+                        Project</a>
+            </div>
             <div id="show_projects" class="collapse in show">
                 <ul class="list-group list-group-flush">
-                    @if ($projects->first()  != null)
+                    @if ($projects->first() != null)
                     @foreach($projects ?? '' as $row)
                     <li class="list-group-item"><a
                             href="{{action('ProjectController@show', $row['id'])}}">{{$row['project_name']}}</a></li>
@@ -39,12 +42,14 @@
                             <th style="width:100px">Due Date</th>
                         </thead>
                     </tr>
-                    @if ($issues->first()  != null)
+                    @if ($issues->first() != null)
                     @foreach ($issues as $row)
                     <tr>
                         <td>{{$row['id']}}</td>
                         <td>{{$row['type']}}</td>
-                        <td><a href="{{route('issue_show', ['project_id'=>$row->project()->first()['id'], 'issue_id'=>$row['id']])}}">{{$row['subject']}}</a></td>
+                        <td><a
+                                href="{{route('issue_show', ['project_id'=>$row->project()->first()['id'], 'issue_id'=>$row['id']])}}">{{$row['subject']}}</a>
+                        </td>
                         @if (empty($row['assigned_user_id']))
                         <td>Not set</td>
                         @else
@@ -80,7 +85,7 @@
                     aria-controls="collapseOne">Dashboard<i class="fas fa-chevron-down fa-fw"></i></div>
         </div>
         <div id="show_histories" class="collapse in show">
-            @if ($histories->first()  != null)
+            @if ($histories->first() != null)
             @foreach ($histories as $row)
             <div class="card bg-light mb-3">
                 <div class="card-header">{{ $row['created_at'] }}</div>

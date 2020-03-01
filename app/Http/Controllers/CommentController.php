@@ -6,6 +6,9 @@ use App\Comment;
 use App\History;
 use App\Issue;
 use App\User;
+use App\Mail\UpdateHistory;
+
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -64,15 +67,15 @@ class CommentController extends Controller
         $this->validate($request, [
             'content' => 'required',
         ]);
-        //创造新variable 并copy 输入的数据
+        //create new variable and copy input data
         $user = Auth::user();
         $comment = new Comment([
             'content' => $request->get('content'),
             'comment_user_id' => $user['id'],
             'issue_id' => $request->get('issue_id'),
         ]);
-        //储存数据
 
+        //save data
         $comment->save();
 
         //create history
@@ -86,6 +89,7 @@ class CommentController extends Controller
         $project_name = $current_project['project_name'];
         $issue_id = $issue_toArray['id'];
 
+        //create history
         $action_log = "$user_name had been <span class=\"badge badge-success\">Comment</span> to issue $issue_id in $project_name";
 
         $history = new History([
@@ -98,7 +102,15 @@ class CommentController extends Controller
 
         $history->save();
 
-        //返回页面
+        //email
+        if($request->get('mail_to_assignee') == "true"){
+            Mail::to($current_issue->postedUser()->first())->send(new UpdateHistory(), [$action_log, $request->get('content')]);
+        }
+        if($request->get('mail_to_publisher') == "true"){
+            Mail::to($current_issue->assignedUser()->first())->send(new UpdateHistory(), [$action_log, $request->get('content')]);
+        }
+
+        //return page
         return redirect()->route('issue_show', ['project_id' => $project_toArray['id'], 'issue_id' => $issue_toArray['id']])->with('success', 'Data Updated');
     }
 

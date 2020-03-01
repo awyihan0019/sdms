@@ -34,8 +34,8 @@ class HomeController extends Controller
 
         $projects = $user->projects()->get();
 
-        $assignedIssues = $user->AssignedIssue()->get();
-        $postedIssues = $user->postedIssue()->get();
+        $assignedIssues = $user->AssignedIssue()->whereIn('status',['Open','In Progress'])->get();
+        $postedIssues = $user->postedIssue()->whereIn('status',['Open','In Progress'])->get();
         $issues = $assignedIssues->merge($postedIssues); //here have some problem fix
 
         $histories = $user->histories()->get()->sortByDesc('created_at');

@@ -1,10 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.project-layout')
 
-@include('project_navbar')
+@section('project-content')
 
-@section('content')
-
-<div style="margin-left:200px;width:70%">
+<div>
     <br />
     <h3>Issue</h3>
     <br />

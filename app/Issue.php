@@ -16,7 +16,7 @@ class Issue extends Model
 
     public function postedUser()
     {
-        return $this->belongsTo(\App\User::class);
+        return $this->belongsTo(\App\User::class, 'post_user_id');
     }
 
     public function assignedUser()

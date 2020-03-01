@@ -1,9 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.project-layout')
 
-@include('project_navbar')
-
-@section('content')
-<div class="row" style="margin-left:200px; width:70%">
+@section('project-content')
+<div class="row">
     <div class="col-md-12">
         <br />
         <h3>Create New Issue </h3>

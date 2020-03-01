@@ -1,9 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.project-layout')
 
-@include('project_navbar')
-
-@section('content')
-<div class="row" style="margin-left:200px; width:70%">
+@section('project-content')
+<div class="row">
     <div class="col-md-12">
         <br />
         <h3>Edit Issue</h3>
@@ -20,30 +18,57 @@
             <form method="post" action="{{action('IssueController@update', [$project_id , $issue['id']])}}">
                 {{csrf_field()}}
                 <input type="hidden" name="_method" value="PATCH" />
-                <div class="form-group" style="max-width:200px">
-                    <select type="text" name="type" class="form-control">
-                        <option value="" disabled>Issue Type</option>
-                        @if ($issue['type'] == 'Task')
-                        <option value="Task" selected>Task</option>
-                        @else
-                        <option value="Task">Task</option>
-                        @endif
-                        @if ($issue['type'] == 'Bug')
-                        <option value="Bug" selected>Bug</option>
-                        @else
-                        <option value="Bug">Bug</option>
-                        @endif
-                        @if ($issue['type'] == 'Request')
-                        <option value="Request" selected>Request</option>
-                        @else
-                        <option value="Request">Request</option>
-                        @endif
-                        @if ($issue['type'] == 'Other')
-                        <option value="Other" selected>Other</option>
-                        @else
-                        <option value="Other">Other</option>
-                        @endif
-                    </select>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label for="description">Type</label>
+                        <select type="text" name="type" class="form-control">
+                            @if ($issue['type'] == 'Task')
+                            <option value="Task" selected>Task</option>
+                            @else
+                            <option value="Task">Task</option>
+                            @endif
+                            @if ($issue['type'] == 'Bug')
+                            <option value="Bug" selected>Bug</option>
+                            @else
+                            <option value="Bug">Bug</option>
+                            @endif
+                            @if ($issue['type'] == 'Request')
+                            <option value="Request" selected>Request</option>
+                            @else
+                            <option value="Request">Request</option>
+                            @endif
+                            @if ($issue['type'] == 'Other')
+                            <option value="Other" selected>Other</option>
+                            @else
+                            <option value="Other">Other</option>
+                            @endif
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="description">Status</label>
+                        <select type="text" name="status" class="form-control">
+                            @if ($issue['status'] == 'Open')
+                            <option value="Open" selected>Open</option>
+                            @else
+                            <option value="Open">Open</option>
+                            @endif
+                            @if ($issue['status'] == 'In Progress')
+                            <option value="In Progress" selected>In Progress</option>
+                            @else
+                            <option value="In Progress">In Progress</option>
+                            @endif
+                            @if ($issue['status'] == 'Resolved')
+                            <option value="Resolved" selected>Resolved</option>
+                            @else
+                            <option value="Resolved">Resolved</option>
+                            @endif
+                            @if ($issue['status'] == 'Closed')
+                            <option value="Closed" selected>Closed</option>
+                            @else
+                            <option value="Closed">Closed</option>
+                            @endif
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group" style="width:100%">
                     <input type="text" name="subject" class="form-control" value="{{ strval($issue['subject']) }}" />
@@ -143,33 +168,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <div class="col-sm-6">
-                        <label for="description">Status</label>
-                        <select type="text" name="status" class="form-control">
-                            <option value="" disabled></option>
-                            @if ($issue['status'] == 'Open')
-                            <option value="Open" selected>Open</option>
-                            @else
-                            <option value="Open">Open</option>
-                            @endif
-                            @if ($issue['status'] == 'In Progress')
-                            <option value="In Progress" selected>In Progress</option>
-                            @else
-                            <option value="In Progress">In Progress</option>
-                            @endif
-                            @if ($issue['status'] == 'Resolved')
-                            <option value="Resolved" selected>Resolved</option>
-                            @else
-                            <option value="Resolved">Resolved</option>
-                            @endif
-                            @if ($issue['status'] == 'Closed')
-                            <option value="Closed" selected>Closed</option>
-                            @else
-                            <option value="Closed">Closed</option>
-                            @endif
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <input type="checkbox" id="mail_notification" name="mail_notification" value="true">
+                    <label for="mail_notification"> Send an email to the Assignee</label><br>
                 </div>
                 <div class="form-group">
                     <input type="hidden" name="project_id" value="{{ $project_id }}">

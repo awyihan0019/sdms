@@ -45,8 +45,8 @@ class IssueController extends Controller
     {
         //
         $project = Project::find($project_id);
-        $issues = $project->issues()->get();
-        return view('issue.index', compact('issues', 'project_id'));
+        $issues = $project->issues()->whereIn('status',['Open','In Progress'])->orderByRaw("FIELD(priority, \"high\", \"normal\", \"low\")")->get();
+        return view('issue.index', ['project_name' => $project['project_name']], compact('issues', 'project_id'));
     }
 
     /**
@@ -57,7 +57,8 @@ class IssueController extends Controller
     public function create($project_id)
     {
         //
-        return view('issue.create', compact('project_id'));
+        $project = Project::find($project_id);
+        return view('issue.create', ['project_name' => $project['project_name']], compact('project_id'));
     }
 
     /**
@@ -99,7 +100,7 @@ class IssueController extends Controller
         //储存数据
         $issue->save();
         $project = Project::findOrFail($request->get('project_id'));
-        $issues = $project->issues()->get();
+        $issues = $project->issues()->whereIn('status',['Open','In Progress'])->orderByRaw("FIELD(priority, \"high\", \"normal\", \"low\")")->get();
 
         //create history
         $user_name = $user['name'];
@@ -118,7 +119,7 @@ class IssueController extends Controller
         $history->save();
 
         //返回页面
-        return view('issue.index', ['project_id' => $request->get('project_id')])->with('issues', $issues);
+        return view('issue.index', ['project_id' => $request->get('project_id'), 'project_name' => $project_name])->with('issues', $issues);
     }
 
     /**
@@ -132,11 +133,11 @@ class IssueController extends Controller
         //
         $user = Auth::user();
         $issue = Issue::find($issue_id);
-        $project_id = Project::find($project_id);
+        $project = Project::find($project_id);
         // $this->checkRole($project_id);
-        $comments = $issue->comments()->get();
+        $comments = $issue->comments()->get()->sortByDesc('created_at');
         $attached_file = $issue->attachments()->get();
-        return view('issue.show', compact('project_id', 'comments', 'issue', 'attached_file'));
+        return view('issue.show', ['project_name' => $project['project_name']], compact('project_id', 'comments', 'issue', 'attached_file'));
 
     }
 
@@ -157,7 +158,7 @@ class IssueController extends Controller
         $comments = $issue->comments()->get();
         $project_members = $project->users()->get()->toArray();
 
-        return view('issue.edit', ['project_id' => $project_id, 'issue_id' => $issue_id], compact('issue', 'issue_id', 'project', 'project_id', 'project_members', 'comments'));
+        return view('issue.edit', ['project_id' => $project_id, 'project_name' => $project['project_name'], 'issue_id' => $issue_id], compact('issue', 'issue_id', 'project', 'project_id', 'project_members', 'comments'));
     }
 
     /**
@@ -199,8 +200,12 @@ class IssueController extends Controller
 
         $issue->save();
 
+        //problem : get original and compare with getChanges
+        // dd($issue->getOriginal(), $issue->getChanges());
         //email notification
-        Mail::to($request->user())->send(new UpdateHistory());
+        if($request->get('mail_notification') == "true"){
+            Mail::to($request->user())->send(new UpdateHistory());
+        }
 
         //create history
         $user_name = $user['name'];
@@ -218,14 +223,14 @@ class IssueController extends Controller
 
         $history->save();
 
-        return redirect()->route('issue_show', ['project_id' => $project['id'], 'issue_id' => $issue['id']]);
+        return redirect()->route('issue_show', ['project_id' => $project['id'], 'issue_id' => $issue['id'], 'project_name' => $project_name]);
     }
 
     //problem : not in used
     public function updateStatus(Request $request)
     {
         $this->validate($request, [
-            'status'    =>  'required',
+            'status' => 'required',
         ]);
 
         $issue = Issue::find($request->get('issue_id'));
@@ -235,7 +240,7 @@ class IssueController extends Controller
         $issue->save();
     }
 
-    public function attachFile(Request $request, $project_id,  $issue_id)
+    public function attachFile(Request $request, $project_id, $issue_id)
     {
         $this->validate($request, [
             'attchFile' => 'required|file|max:5000',
@@ -243,6 +248,7 @@ class IssueController extends Controller
 
         $user = Auth::user();
         $issue = Issue::find($issue_id);
+        $project = Project::find($project_id);
 
         $uploadedFile = $request->file('attchFile');
         $fileName = $uploadedFile->getClientOriginalName();
@@ -256,7 +262,7 @@ class IssueController extends Controller
 
         $attachment->save();
 
-        return redirect()->route('issue_show', ['project_id' => $project_id, 'issue_id' => $issue_id]);
+        return redirect()->route('issue_show', ['project_id' => $project_id, 'issue_id' => $issue_id, 'project_name' => $project['project_name']]);
     }
 
     public function download($id)
@@ -277,5 +283,105 @@ class IssueController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function priorityControl($project_id)
+    {
+        //
+        $project = Project::find($project_id);
+        $issues = $project->issues()->whereIn('status',['Open','In Progress'])->get();
+        $suggested_issues = $issues->map(function ($row) {
+            $this->suggestionDefine($row);
+            if ($row['suggested_priority'] == $row['priority']) {
+                return null;
+            }
+            return $row;
+        });
+        return view('issue.priority_prediction', ['project_name' => $project['project_name']], compact('suggested_issues', 'project_id'));
+    }
+
+    public function suggestionDefine($issue)
+    {
+        $priority_level =0;
+        $suggested_priority;
+        $reason = "";
+
+        //check due date
+        if (strtotime($issue['due_date']) - strtotime(date('Ymd')) < 259200) {
+            $priority_level += 5;
+            $reason .= "Due date : less than 3 days <i class=\"fas fa-arrow-up\" style =\"color:red\"></i><br>";
+        }else if(strtotime($issue['due_date']) - strtotime(date('Ymd')) < 604800){
+            $priority_level += 2;
+            $reason .= "Due date : less than 7 days <i class=\"fas fa-equals\" style =\"color:blue\"></i><br>";
+        }else{
+            $priority_level += 1;
+            $reason .= "Due date : more than 7 days   <i class=\"fas fa-arrow-down\" style =\"color:green\"></i><br>";
+        }
+
+        //check created date
+        if (strtotime("now") - strtotime($issue['created_at']) > 1209600) {
+            $priority_level += 5;
+            $reason .= "Issue Created date : more than 14 days <i class=\"fas fa-arrow-up\" style =\"color:red\"></i><br>";
+        }else if(strtotime("now") - strtotime($issue['created_at']) > 604800){
+            $priority_level += 2;
+            $reason .= "Issue Created date : more than 7 days <i class=\"fas fa-equals\" style =\"color:blue\"></i><br>";
+        }else{
+            $priority_level += 1;
+            $reason .= "Issue Created date : less than 7 days   <i class=\"fas fa-arrow-down\" style =\"color:green\"></i><br>";
+        }
+
+        //check catogory
+        if ($issue['category'] == 'Database') {
+            $priority_level += 5;
+            $reason .= "Issue Category : related to database <i class=\"fas fa-arrow-up\" style =\"color:red\"></i><br>";
+        }else if($issue['category'] == 'Functionality'){
+            $priority_level += 2;
+            $reason .= "Issue Category : related to functionality <i class=\"fas fa-equals\" style =\"color:blue\"></i><br>";
+        }else{
+            $priority_level += 1;
+            $reason .= "Issue Category : related to user interface   <i class=\"fas fa-arrow-down\" style =\"color:green\"></i><br>";
+        }
+
+        //check severity
+        if ($issue['severity'] == 'high') {
+            $priority_level += 5;
+            $reason .= "Issue severity : severity is high <i class=\"fas fa-arrow-up\" style =\"color:red\"></i><br>";
+        }else if($issue['severity'] == 'normal'){
+            $priority_level += 2;
+            $reason .= "Issue severity : severity is normal <i class=\"fas fa-equals\" style =\"color:blue\"></i><br>";
+        }else{
+            $priority_level += 1;
+            $reason .= "Issue severity : severity is low   <i class=\"fas fa-arrow-down\" style =\"color:green\"></i><br>";
+        }
+
+        //check the priority level
+        if($priority_level >= 12){
+            $suggested_priority = 'high';
+        }else if($priority_level >= 8){
+            $suggested_priority = 'normal';
+        }else{
+            $suggested_priority = 'low';
+        }
+
+        //define the suggested reason and suggested priority
+        $issue->priority_level = $priority_level;
+        $issue->suggested_priority = $suggested_priority;
+        $issue->reason = $reason;
+        return $issue;
+    }
+
+    public function updatePriority(Request $request, $project_id, $issue_id)
+    {
+        $this->validate($request, [
+            'suggested_priority' => 'required',
+        ]);
+
+        $issue = Issue::find($issue_id);
+
+        $issue->priority = $request->get('suggested_priority');
+
+        $issue->save();
+
+        return redirect()->route('priority_control', ['project_id'=>$project_id]);
     }
 }
