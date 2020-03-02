@@ -54,6 +54,8 @@ Route::get('project/{project_id}/issue/edit/{issue_id}', [
 
 Route::patch('project/{project_id}/issue/store/{issue_id}', 'IssueController@update');
 
+Route::patch('project/{project_id}/issue/update_status/{issue_id}', 'IssueController@updateStatus');
+
 Route::patch('project/{project_id}/issue/update_priority/{issue_id}', 'IssueController@updatePriority');
 
 Route::get('project/{project_id}//issue/show/{issue_id}', [

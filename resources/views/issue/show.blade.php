@@ -5,9 +5,61 @@
     <div class="col-md-12">
         <br />
         <h3>Issue #{{ $issue['id']}}
+            @can('change_status')
+            <button class="btn btn-secondary float-right" data-toggle="modal" data-target="#update_status"
+                style="margin-right:20px">
+                <i class="fas fa-edit">Update Status</i>
+            </button>
+            @endcan
+            <!-- Update Status Modal -->
+            <div class="modal" id="update_status" tabindex="-1" role="dialog" aria-labelledby="update_statusLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="update_statusLabel">Update Status</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="update_status" method="post"
+                                action="{{action('IssueController@updateStatus',[$project_id ,$issue['id']])}}">
+                                {{csrf_field()}}
+                                <input type="hidden" name="_method" value="PATCH" />
+                                <div class="form-group">
+                                    <select type="text" name="status" class="form-control">
+                                        @if ($issue['status'] == 'Open')
+                                        <option value="Open" selected>Open</option>
+                                        @else
+                                        <option value="Open">Open</option>
+                                        @endif
+                                        @if ($issue['status'] == 'In Progress')
+                                        <option value="In Progress" selected>In Progress</option>
+                                        @else
+                                        <option value="In Progress">In Progress</option>
+                                        @endif
+                                        @if ($issue['status'] == 'Resolved')
+                                        <option value="Resolved" selected>Resolved</option>
+                                        @else
+                                        <option value="Resolved">Resolved</option>
+                                        @endif
+                                        @if ($issue['status'] == 'Closed')
+                                        <option value="Closed" selected>Closed</option>
+                                        @else
+                                        <option value="Closed">Closed</option>
+                                        @endif
+                                    </select>
+                                </div>
+                                <input type="submit" class="btn btn-primary" aglin="right" value="Upload Status" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
             @can('edit_issues')
             <a href="{{route('issue_edit', ['project_id'=>$project_id, 'issue_id'=>$issue['id']])}}"
-                class="btn btn-secondary float-right" style="margin-righr:20px">
+                class="btn btn-secondary float-right" style="margin-right:20px">
                 <i class="fas fa-edit">Edit Issue</i>
             </a>
             @endcan

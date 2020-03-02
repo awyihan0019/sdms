@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Charts\ProgressChart;
 use App\History;
 use App\Project;
 use App\User;
@@ -26,7 +27,7 @@ class ProjectController extends Controller
         $this->middleware(function ($request, $next) {
             $this->user = Auth::user();
 
-            if (empty(Route::current()->parameters['project_id'])){
+            if (empty(Route::current()->parameters['project_id'])) {
                 // dd(Route::current()->uri);
             } else {
                 $project_id = Route::current()->parameters['project_id'];
@@ -88,7 +89,7 @@ class ProjectController extends Controller
         //create histories
         $user_name = $user['name'];
         $project_name = $project['project_name'];
-        $action_log = "$user_name <span class=\"badge badge-success\">Create</span> a project $project_name";
+        $action_log = "<Strong>$user_name</Strong> <span class=\"badge badge-success\">Create</span> a project <strong>$project_name</strong>";
 
         $history = new History([
             'user_id' => $user['id'],
@@ -122,10 +123,35 @@ class ProjectController extends Controller
         //get all histories for project
         $histories = $project->histories()->get()->sortByDesc('created_at');
 
-        // return view('project.show', compact('project', 'project_id', 'users', 'histories'));
-        //
-        //,['project_id' => $project_id]
-        return view('project.show', compact('project_id', 'project_name', 'users', 'histories'));
+        //get all issue count
+        // dd($project->issues()->whereIn('status',['Open','In Progress'])->get()->count());
+        $closedIssues = $project->issues()->get()->count();
+        $openIssues = $project->issues()->where('status', 'Open')->get()->count();
+        $progressIssues = $project->issues()->where('status', 'In Progress')->get()->count();
+        $closedIssues = $project->issues()->where('status', 'Closed')->get()->count();
+        $resolvedIssues = $project->issues()->where('status', 'Resolved')->get()->count();
+
+        //create progress chart
+        $progressChart = new ProgressChart;
+        $progressChart->displayAxes(false);
+        $progressChart->labels(['Open', 'In Progress', 'Resolved', 'Closed']);
+        $progressChart->dataset('Progress by Issue Status', 'doughnut', [$openIssues, $progressIssues, $resolvedIssues, $closedIssues])->backgroundColor(['#ed8077','#4488c5','#5eb5a6','#b0be3c']);
+
+        //get all issue count by catogory
+        $uiIssuesO = $project->issues()->where('category', 'User Interface')->where('status', 'Open')->get()->count();
+        $funcIssuesO = $project->issues()->where('category', 'Functionality')->where('status', 'Open')->get()->count();
+        $dbIssuesO = $project->issues()->where('category', 'Database')->where('status', 'Open')->get()->count();
+        $uiIssuesIP = $project->issues()->where('category', 'User Interface')->where('status', 'In Progress')->get()->count();
+        $funcIssuesIP = $project->issues()->where('category', 'Functionality')->where('status', 'In Progress')->get()->count();
+        $dbIssuesIP = $project->issues()->where('category', 'Database')->where('status', 'In Progress')->get()->count();
+
+        //create catogory progress chart
+        $categoryChart = new ProgressChart;
+        $categoryChart->labels(['User Interface', 'Functionality', 'Database']);
+        $categoryChart->dataset('Open', 'bar', [$uiIssuesO, $funcIssuesO, $dbIssuesO])->backgroundColor(['#ed8077', '#ed8077', '#ed8077'])->color('black');
+        $categoryChart->dataset('In Progress', 'bar', [$uiIssuesIP, $funcIssuesIP, $dbIssuesIP])->backgroundColor(['#4488c5', '#4488c5', '#4488c5'])->color('black');
+
+        return view('project.show', compact('project_id', 'project_name', 'users', 'histories', 'progressChart', 'categoryChart'));
     }
 
     /**
@@ -195,8 +221,9 @@ class ProjectController extends Controller
 
         // //储存数据
         $user = User::where('email', $email)->first();
+
         if (empty($user)) {
-            return redirect()->back()->with('error', 'The email not found in used');
+            return redirect()->back()->withErrors(array('message' => 'The email not found in used'));
         } else {
             $project = Project::findOrFail($project_id);
 
@@ -204,17 +231,21 @@ class ProjectController extends Controller
 
             foreach ($project_members as $member) {
                 if ($member['email'] == $email) {
-                    return redirect()->back()->with('error', 'The member is already added');
+                    return redirect()->back()->withErrors(array('message' => 'The member is already added'));
                 }
             }
 
+            //add user to project
             $user->projects()->attach($project);
+            //with role
             $user->projects()->updateExistingPivot($project, ['role' => $request->input('role')]);
+
+
             //add history
             $user_name = $user['name'];
             $project_name = $project['project_name'];
 
-            $action_log = "$project_name has been <span class=\"badge badge-success\">Invite</span> a new member $user_name";
+            $action_log = "<strong>$project_name</strong> has been <span class=\"badge badge-success\">Invite</span> a new member <strong>$user_name</strong>";
 
             $history = new History([
                 'user_id' => $user['id'],
@@ -223,8 +254,13 @@ class ProjectController extends Controller
             ]);
 
             $history->save();
+
+            //email invitee
+            if($request->get('mail_to_invitee') == "true"){
+                Mail::to($user)->send(new UpdateHistory());
+            }
         }
         //返回页面
-        return redirect()->action('ProjectController@show', $project_id);
+        return redirect()->action('ProjectController@showMember', $project_id);
     }
 }

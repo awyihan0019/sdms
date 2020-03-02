@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         //create permission
         $permissionEditIssue = Permission::create(['name' => 'edit_issues']);
         $permissionCreateIssue = Permission::create(['name' => 'create_issues']);
+        $permissionAssignIssue = Permission::create(['name' => 'assign_issue']);
         $permissionCommentIssue = Permission::create(['name' => 'comment_issues']);
         $permissionChangeStatus = Permission::create(['name' => 'change_status']);
         $permissionAttachFile = Permission::create(['name' => 'attach_file']);
@@ -37,6 +38,7 @@ class DatabaseSeeder extends Seeder
         $permissionChangeStatus->assignRole($roleManager);
         $permissionAttachFile->assignRole($roleManager);
         $permissionInviteMember->assignRole($roleManager);
+        $permissionAssignIssue->assignRole($roleManager);
 
         //assign permission to Tester
         $permissionEditIssue->assignRole($roleTester);

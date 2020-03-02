@@ -35,6 +35,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
     </script>
+    {{-- ChartScript --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js" charset="utf-8"></script>
 
 </head>
 
@@ -44,7 +46,7 @@
 
         <!-- Sidebar -->
         <div class="bg-light border-right" id="sidebar-wrapper">
-            <div class="sidebar-heading">Start Bootstrap </div>
+            <div class="sidebar-heading">Menu </div>
             <div class="list-group list-group-flush">
                 <a href="{{route('currentProject', ['project_id'=>$project_id])}}"
                     class="list-group-item list-group-item-action bg-light"><i class="fa fa-home"></i> Project</a>

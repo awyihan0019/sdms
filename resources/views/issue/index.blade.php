@@ -4,7 +4,7 @@
 
 <div>
     <br />
-    <h3>Issue</h3>
+    <h3>Issues </h3>
     <br />
     @if($message = Session::get('success'))
     <div class="alert alert-success">
@@ -32,7 +32,11 @@
             @else
             <td>{{ $row->assignedUser()->first()['name'] }}</td>
             @endif
-            <td>{{$row['status']}}</td>
+            @if ($row['status'] == "Open")
+            <td class="text-danger">{{$row['status']}}</td>
+            @else
+            <td class="text-primary">{{$row['status']}}</td>
+            @endif
             @if ($row['priority'] == "high")
             <td class="text-danger">High</td>
             @elseif($row['priority'] == "normal")

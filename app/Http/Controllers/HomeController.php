@@ -36,12 +36,21 @@ class HomeController extends Controller
 
         $assignedIssues = $user->AssignedIssue()->whereIn('status',['Open','In Progress'])->get();
         $postedIssues = $user->postedIssue()->whereIn('status',['Open','In Progress'])->get();
-        $issues = $assignedIssues->merge($postedIssues); //here have some problem fix
+        $issues = $assignedIssues->merge($postedIssues);
 
+        //get history
+        $projects = $user->projects()->get();
         $histories = $user->histories()->get()->sortByDesc('created_at');
+        foreach($projects as $p){
+            $historyForProject = $p->histories()->get();
+            $histories = $histories->merge($historyForProject)->sortByDesc('created_at');
+        }
+
         return view('/home', [
             'projects' => $projects,
             'issues' => $issues,
+            'assignedIssues' => $assignedIssues,
+            'postedIssues' => $postedIssues,
             'histories' => $histories]);
     }
 }

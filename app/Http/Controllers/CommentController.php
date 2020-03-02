@@ -89,8 +89,8 @@ class CommentController extends Controller
         $project_name = $current_project['project_name'];
         $issue_id = $issue_toArray['id'];
 
-        //create history
-        $action_log = "$user_name had been <span class=\"badge badge-success\">Comment</span> to issue $issue_id in $project_name";
+        //create history log
+        $action_log = "<strong>$user_name</strong> had been <span class=\"badge badge-success\">Comment</span> to <strong>issue#$issue_id</strong> in <strong>$project_name</strong>";
 
         $history = new History([
             'user_id' => $user['id'],

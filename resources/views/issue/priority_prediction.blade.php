@@ -2,7 +2,7 @@
 @section('project-content')
 <div>
     <br />
-    <h3>Issue</h3>
+    <h3>Priority Control</h3>
     <br />
     @if($message = Session::get('success'))
     <div class="alert alert-success">

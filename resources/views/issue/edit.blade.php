@@ -44,8 +44,9 @@
                             @endif
                         </select>
                     </div>
+                    @if(auth()->user()->can('change_status'))
                     <div class="col-sm-6">
-                        <label for="description">Status</label>
+                        <label for="status">Status</label>
                         <select type="text" name="status" class="form-control">
                             @if ($issue['status'] == 'Open')
                             <option value="Open" selected>Open</option>
@@ -69,6 +70,9 @@
                             @endif
                         </select>
                     </div>
+                    @else
+                    <input type="hidden" name="status" value="{{ $issue['status'] }}">
+                    @endif
                 </div>
                 <div class="form-group" style="width:100%">
                     <input type="text" name="subject" class="form-control" value="{{ strval($issue['subject']) }}" />
@@ -149,6 +153,7 @@
                         <input type="text" name="version" class="form-control" value="{{ $issue['version'] }}" />
                     </div>
                 </div>
+                @can('assign_issue')
                 <div class="form-group row">
                     <div class="col-sm-6">
                         <label for="due_date">Due Date</label>
@@ -168,6 +173,7 @@
                         </select>
                     </div>
                 </div>
+                @endcan
                 <div class="form-group">
                     <input type="checkbox" id="mail_notification" name="mail_notification" value="true">
                     <label for="mail_notification"> Send an email to the Assignee</label><br>
